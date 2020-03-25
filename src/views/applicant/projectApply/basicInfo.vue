@@ -63,14 +63,27 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { addProject, getAppInfo } from "@/api/applicant";
 import { getUserInfo } from "@/api/user";
 import router from "@/router";
+=======
+import {
+  addProject,
+  getAppInfo,
+  getLaterProject,
+  deleteProject
+} from '@/api/applicant'
+import { getUserInfo } from '@/api/user'
+import router from '@/router'
+import { PROJECTUPDATE } from '@/variables'
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 export default {
   data() {
     return {
       active: 0,
       basicInfo: {
+<<<<<<< HEAD
         proName: "",
         proType: "",
         subject: ""
@@ -121,6 +134,55 @@ export default {
     this.fetchData();
   }
 };
+=======
+        proName: '',
+        proType: '',
+        subject: ''
+      },
+      deptInfo: {
+        address: '',
+        postalCode: '',
+        deptName: ''
+      }
+    }
+  },
+  methods: {
+    async onSubmit() {
+      const { userVo } = await getUserInfo()
+      const { projects } = await getLaterProject(userVo, PROJECTUPDATE)
+      if (projects.length != 0) {
+        await deleteProject(projects[0].id)
+      }
+      const { addProjectInfo } = await addProject(this.basicInfo, userVo.id)
+      if (addProjectInfo != null) {
+        this.$message({
+          message: '添加项目基本信息成功！',
+          type: 'success'
+        })
+        this.$router.push('/projectApply/projectContent')
+      }
+    },
+    onCancel(basicInfo) {
+      this.$refs[basicInfo].resetFields()
+    },
+    fetchData() {
+      getUserInfo().then(response => {
+        const { userVo } = response
+        getAppInfo(userVo.id).then(response => {
+          const { user } = response
+          const { repDept } = user
+          this.deptInfo = repDept
+          this.deptInfo.deptName =
+            user.repDept.recDept.deptName + '/' + user.repDept.deptName
+        })
+      })
+    }
+  },
+  created() {
+    this.fetchData()
+  }
+}
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>
 
 <style lang='scss' scoped>

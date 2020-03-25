@@ -1,7 +1,7 @@
 // import { login, logout, getInfo } from '@/api/user'
 import { login, getUserInfo, logout } from '@/api/user'
 import { getToken, setToken, removeToken, getUserType, setUserType, removeUserType } from '@/utils/auth'
-// import { resetRouter } from '@/router'
+import { formatLoginName } from '@/utils/format-data'
 
 const getDefaultState = () => {
     return {
@@ -22,9 +22,9 @@ const state = getDefaultState()
 //     userType: getUserType(),
 // }
 const mutations = {
-    SET_LOGIN: (state, data) => {
-        state.loginName = data.loginName
-        state.loginParam = data.loginParam
+    SET_LOGIN: (state, loginParam) => {
+        state.loginParam = loginParam
+        state.loginName = formatLoginName(loginParam)
     },
     SET_USERNAME: (state, username) => {
         state.username = username
@@ -36,13 +36,15 @@ const mutations = {
         state.userType = userType
     },
     RESET_STATE: (state) => {
-        Object.assign(state, getDefaultState())
+        state.username = ""
+        state.token = getToken()
+        state.userType = getUserType()
     },
 }
 
 const actions = {
-    setLogin({ commit }, data) {
-        commit('SET_LOGIN', data)
+    setLogin({ commit }, loginParam) {
+        commit('SET_LOGIN', loginParam)
     },
 
     login({ commit, state }, userInfo) {
@@ -66,8 +68,13 @@ const actions = {
     getUserInfo({ commit }) {
         return new Promise((resolve, reject) => {
             getUserInfo().then(response => {
+<<<<<<< HEAD
                 const { user } = response
                 const { username } = user
+=======
+                const { userVo } = response
+                const { username } = userVo
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 
                 if (!username) {
                     reject('Verification failed, please Login again.')

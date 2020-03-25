@@ -4,7 +4,6 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken, getUserType } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
-import jump from '@/utils/jump'
 import { Message } from 'element-ui'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
@@ -19,12 +18,16 @@ router.beforeEach(async (to, from, next) => {
   document.title = getPageTitle(to.meta.title)
   const hasToken = getToken()
   const userType = getUserType()
-
   if (hasToken) {
     const hasGetUserInfo = store.getters.username
+    store.dispatch("user/setLogin", userType);
     if (hasGetUserInfo) {
       if (whiteList[0].indexOf(to.path) !== -1 && to.query.loginParam == userType) {
+<<<<<<< HEAD
         store.dispatch("user/setLogin", to.query);
+=======
+        // store.dispatch("user/setLogin", to.query.loginParam);
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
         // let jumpUrl = jump(userType)
         next("/index")
       }

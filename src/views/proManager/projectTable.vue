@@ -30,23 +30,37 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { getUserInfo } from "@/api/user";
 import { getProList } from "@/api/applicant";
+=======
+import { getUserInfo } from '@/api/user'
+import { getProList } from '@/api/applicant'
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
+<<<<<<< HEAD
         published: "success",
         draft: "gray",
         deleted: "danger"
       };
       return statusMap[status];
+=======
+        published: 'success',
+        draft: 'gray',
+        deleted: 'danger'
+      }
+      return statusMap[status]
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     }
   },
   data() {
     return {
       tableData: [],
       listLoading: true
+<<<<<<< HEAD
     };
   },
   created() {
@@ -74,4 +88,33 @@ export default {
     }
   }
 };
+=======
+    }
+  },
+  created() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+      this.listLoading = true
+      getUserInfo().then(response => {
+        const { userVo } = response
+        getProList(userVo.id).then(response => {
+          const { proList } = response
+
+          this.tableData = proList
+          for (var i = 0; i < proList.length; i++) {
+            this.tableData[i].appName = proList[i].applicant.name
+          }
+          this.listLoading = false
+        })
+      })
+      this.listLoading = false
+    },
+    deleteRow(index, rows) {
+      rows.splice(index, 1)
+    }
+  }
+}
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>

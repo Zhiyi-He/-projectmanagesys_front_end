@@ -45,12 +45,20 @@
       <el-row>
         <el-col :span="11">
           <el-form-item label="姓名：">
+<<<<<<< HEAD
             <el-input v-model="appInfo.name" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.name" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="性别：">
+<<<<<<< HEAD
             <el-input v-model="appInfo.sex" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.sex" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
@@ -58,24 +66,40 @@
       <el-row>
         <el-col :span="11">
           <el-form-item label="学校学历情况:">
+<<<<<<< HEAD
             <el-input v-model="appInfo.schoolAndEdu" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.schoolAndEdu" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="专业领域：">
+<<<<<<< HEAD
             <el-input v-model="appInfo.profession" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.profession" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="11">
           <el-form-item label="手机号码：">
+<<<<<<< HEAD
             <el-input v-model="appInfo.tel" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.tel" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="邮箱：">
+<<<<<<< HEAD
             <el-input v-model="appInfo.email" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.email" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
@@ -83,43 +107,71 @@
       <el-row>
         <el-col :span="11">
           <el-form-item label="单位名称：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.deptName" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.deptName" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="通讯地址：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.address" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.address" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="11">
           <el-form-item label="邮政编码：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.postalCode" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.postalCode" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="邮箱：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.email" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.email" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="11">
           <el-form-item label="联系电话：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.tel" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.tel" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
         <el-col :span="11" :offset="2">
           <el-form-item label="联系人姓名：">
+<<<<<<< HEAD
             <el-input v-model="deptInfo.contact" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.contact" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
       <el-row>
         <el-col :span="24">
           <el-form-item label="科研监管单位：">
+<<<<<<< HEAD
             <el-input v-model="recDept" :disabled="true" />
+=======
+            <el-input v-model="projectContent.applicant.repDept.recDept.deptName" :disabled="true" />
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           </el-form-item>
         </el-col>
       </el-row>
@@ -135,7 +187,11 @@
         <el-input v-model="projectContent.desc" type="textarea" placeholder="300字以内" />
       </el-form-item>
       <el-form-item>
+<<<<<<< HEAD
         <el-button type="primary" @click="onSubmit()">保存</el-button>
+=======
+        <el-button type="primary" @click="onSubmit(projectContent)">保存</el-button>
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
         <el-button @click="onCancel">取消</el-button>
       </el-form-item>
     </el-form>
@@ -143,16 +199,27 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { getLaterProject, updateProject } from "@/api/applicant";
 import router from "@/router";
 export default {
   data() {
     const options = [10000, 20000, 50000, 100000];
+=======
+import { getUserInfo } from '@/api/user'
+import { getLaterProject, updateProjects, getAppInfo } from '@/api/applicant'
+import router from '@/router'
+import { PROJECTUPDATE } from '@/variables'
+export default {
+  data() {
+    const options = [10000, 20000, 50000, 100000]
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     return {
       options: options,
       active: 1,
       projectContent: {
         id: 0,
+<<<<<<< HEAD
         proName: "",
         subject: "",
         funds: 0,
@@ -214,6 +281,69 @@ export default {
     this.fetchData();
   }
 };
+=======
+        proName: '',
+        subject: '',
+        funds: 0,
+        time: '',
+        keywords: '',
+        desc: '',
+        applicant: {
+          name: '',
+          sex: '',
+          schoolAndEdu: '',
+          profession: '',
+          tel: '',
+          email: '',
+          repDept: {
+            deptName: '',
+            address: '',
+            tel: '',
+            email: '',
+            postalCode: '',
+            contact: '',
+            recDept: {
+              deptName: ''
+            }
+          }
+        }
+      }
+    }
+  },
+  methods: {
+    async onSubmit(projectContent) {
+      const { updatePros } = await updateProjects([projectContent])
+      if (updatePros != null) {
+        this.$message({
+          message: '添加项目内容成功！',
+          type: 'success'
+        })
+        this.$router.push('/projectApply/fileUpload')
+      }
+    },
+    onCancel() {
+      this.fetchData()
+    },
+    async fetchData() {
+      const { userVo } = await getUserInfo()
+      const { projects } = await getLaterProject(userVo, PROJECTUPDATE)
+      if (projects.length != 0) {
+        this.projectContent = projects[0]
+        this.projectContent.applicant.schoolAndEdu =
+          projects[0].applicant.school + projects[0].applicant.edu
+      } else {
+        this.$message({
+          message: '当前并无增加或者需要修改的项目',
+          type: 'error'
+        })
+      }
+    }
+  },
+  created() {
+    this.fetchData()
+  }
+}
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>
 
 <style lang='scss' scoped>

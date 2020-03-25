@@ -71,15 +71,15 @@
 </template>
 
 <script>
-import store from "@/store";
-import { mapGetters } from "vuex";
-import jump from "@/utils/jump";
+import store from '@/store'
+import { mapGetters } from 'vuex'
 
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     return {
       loginForm: {
+<<<<<<< HEAD
         username: "xiaobao520",
         password: "123456"
       },
@@ -87,17 +87,26 @@ export default {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           { min: 3, max: 15, message: "请输入正确的用户名", trigger: "blur" }
+=======
+        username: 'xiaobao520',
+        password: '123456'
+      },
+      loginRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 15, message: '请输入正确的用户名', trigger: 'blur' }
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, max: 15, message: "请输入正确的密码", trigger: "blur" }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, max: 15, message: '请输入正确的密码', trigger: 'blur' }
         ]
       },
       loading: false,
-      passwordType: "password",
+      passwordType: 'password',
       redirect: undefined,
-      jumpUrl: ""
-    };
+      jumpUrl: ''
+    }
   },
   watch: {
     $route: {
@@ -106,52 +115,56 @@ export default {
         // 回调函数，两个参数，to：当前的组件，from：上一个组件
         // this.redirect = to.query && to.query.redirect;
         if (to.query.redirect == undefined) {
+<<<<<<< HEAD
           store.dispatch("user/setLogin", to.query);
+=======
+          store.dispatch('user/setLogin', to.query.loginParam)
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           // this.redirect = jump(to.query.loginParam);
         } else {
-          this.redirect = to.query && to.query.redirect;
+          this.redirect = to.query && to.query.redirect
         }
       }
     }
   },
   methods: {
     backHome() {
-      this.$router.push("/");
+      this.$router.push('/')
     },
     showPwd() {
-      if (this.passwordType === "password") {
-        this.passwordType = "";
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
       } else {
-        this.passwordType = "password";
+        this.passwordType = 'password'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus();
-      });
+        this.$refs.password.focus()
+      })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
+          this.loading = true
           this.$store
-            .dispatch("user/login", this.loginForm)
+            .dispatch('user/login', this.loginForm)
             .then(() => {
-              this.$router.push({ path: this.redirect || "/index" });
-              this.loading = false;
+              this.$router.push({ path: this.redirect || '/index' })
+              this.loading = false
             })
             .catch(() => {
-              this.loading = false;
-            });
+              this.loading = false
+            })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     }
   },
   computed: {
-    ...mapGetters(["loginName"])
+    ...mapGetters(['loginName'])
   }
-};
+}
 </script>
 
 <style lang="scss">

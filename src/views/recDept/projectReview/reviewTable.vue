@@ -1,0 +1,277 @@
+<template>
+  <div class="app-container">
+    <el-button
+      @click="multipleSelection.length==0?multipleSelectionTip():pass(multipleSelection)"
+      icon="el-icon-check"
+      type="primary"
+      plain
+    >通过多选</el-button>
+    <el-button
+      @click="multipleSelection.length==0?multipleSelectionTip():backModify(multipleSelection)"
+      icon="el-icon-edit"
+      type="warning"
+      plain
+    >打回修改多选</el-button>
+    <el-button
+      @click="multipleSelection.length==0?multipleSelectionTip():notPass(multipleSelection)"
+      icon="el-icon-close"
+      type="danger"
+      plain
+    >不通过多选</el-button>
+    <el-table
+      v-loading="listLoading"
+      :data="reviewTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      element-loading-text="Loading"
+      border
+      fit
+      highlight-current-row
+      @selection-change="handleSelectionChange"
+      @filter-change="filterProjectTable"
+    >
+      <el-table-column type="selection" width="55"></el-table-column>
+      <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
+
+      <el-table-column prop="id" label="项目编号" sortable></el-table-column>
+      <el-table-column prop="proType" label="项目类型"></el-table-column>
+      <el-table-column prop="proName" label="项目名称"></el-table-column>
+      <el-table-column prop="subject" label="学科分类"></el-table-column>
+      <el-table-column prop="funds" width="150px" label="项目经费（元）" sortable></el-table-column>
+      <el-table-column
+        prop="applicant.name"
+        label="申报人"
+        :filters="appNameFilter"
+        :column-key="'appName'"
+      ></el-table-column>
+      <el-table-column fixed="right" label="操作" width="220px">
+        <template slot-scope="scope">
+          <el-button @click="notPass([scope.row])" type="text" size="small">不通过</el-button>
+          <el-button @click="backModify([scope.row])" type="text" size="small">打回修改</el-button>
+          <el-button @click="pass([scope.row])" type="text" size="small">通过</el-button>
+          <el-button
+            @click="dialogFormVisible=true,projectDetails=scope.row"
+            type="text"
+            size="small"
+          >查看详情</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      background
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-sizes="pageSizes"
+      :page-size="pageSize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="reviewTable.length"
+    ></el-pagination>
+
+    <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
+      <el-form
+        label-position="left"
+        ref="projectDetails"
+        :model="projectDetails"
+        label-width="120px"
+        :disabled="true"
+      >
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="项目编号：" prop="id">
+              <el-input v-model="projectDetails.id" :disabled="true" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="项目名称：" prop="proName">
+              <el-input v-model="projectDetails.proName" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="项目类型：" prop="proType">
+              <el-input v-model="projectDetails.proType" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="10" :offset="2">
+            <el-form-item label="学科分类：" prop="subject">
+              <el-input v-model="projectDetails.subject" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="项目经费：" prop="funds">
+              <el-input v-model="projectDetails.funds" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="10" :offset="2">
+            <el-form-item label="研究年限：" prop="time">
+              <el-input v-model="projectDetails.time" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="关键词：" prop="keywords">
+              <el-input v-model="projectDetails.keywords" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="项目内容摘要" prop="desc">
+              <el-input v-model="projectDetails.desc" type="textarea" placeholder="300字以内" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="项目文件" prop="desc">
+              <el-input v-model="projectDetails.desc" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="pass([projectDetails])">通过</el-button>
+        <el-button type="warning" @click="backModify([projectDetails])">打回修改</el-button>
+        <el-button type="danger" @click="notPass([projectDetails])">不通过</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template>
+
+<script>
+import { getApplicants } from '@/api/repDept'
+import { getLaterProject, updateProjects } from '@/api/applicant'
+import { getUserInfo } from '@/api/user'
+import { FIRSTREVIEW, NOTPASS, BACKMODIFY, SECONDREVIEW } from '@/variables'
+export default {
+  data() {
+    return {
+      appNameFilter: [],
+      reviewTable: [],
+      firstData: [],
+      listLoading: true,
+      multipleSelection: [],
+      dialogFormVisible: false,
+      projectDetails: {
+        id: '',
+        proName: '',
+        proType: '',
+        subject: '',
+        funds: 0,
+        time: 0,
+        keywords: '',
+        desc: ''
+      },
+      pageSize: 5,
+      currentPage: 1,
+      pageSizes: [5, 10, 15, 20]
+    }
+  },
+  created() {
+    this.fetchData()
+  },
+  computed: {
+    indexComputed() {
+      return (this.currentPage - 1) * this.pageSize + 1
+    }
+  },
+  methods: {
+    async fetchData() {
+      this.listLoading = true
+      this.reviewTable = []
+      const { userVo } = await getUserInfo()
+      const { applicants } = await getApplicants(userVo.id)
+      for (let index = 0; index < applicants.length; index++) {
+        this.appNameFilter.push({
+          text: applicants[index].name,
+          value: applicants[index].name
+        })
+        const { projects } = await getLaterProject(
+          applicants[index],
+          FIRSTREVIEW
+        )
+        this.firstData = this.reviewTable = this.reviewTable.concat(projects)
+      }
+      this.listLoading = false
+    },
+    review(projects, msg, confirmMsg) {
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          const { updatePros } = await updateProjects(projects)
+          if (updatePros.length != 0) {
+            this.$message({
+              message: confirmMsg,
+              type: 'success'
+            })
+            this.dialogFormVisible = false
+            this.fetchData()
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+    },
+    notPass(projects) {
+      projects.forEach(project => {
+        project.proStatus = NOTPASS
+      })
+      this.review(projects, '是否要不通过该项目', '不通过该项目成功！')
+    },
+    backModify(projects) {
+      projects.forEach(project => {
+        project.proStatus = BACKMODIFY
+      })
+      this.review(projects, '是否要打回修改该项目', '打回修改该项目成功！')
+    },
+    pass(projects) {
+      projects.forEach(project => {
+        project.proStatus = SECONDREVIEW
+      })
+      this.review(projects, '是否要通过该项目', '通过该项目成功！')
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    multipleSelectionTip() {
+      this.$message({
+        message: '请选择项目',
+        type: 'warning'
+      })
+    },
+    handleSizeChange(val) {
+      this.pageSize = val
+      this.currentPage = 1
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val
+    },
+    filterProjectTable(filters) {
+      this.reviewTable = this.firstData
+
+      if (filters.appName && filters.appName.length != 0) {
+        this.reviewTable = this.reviewTable.filter(project => {
+          return filters.appName.indexOf(project.applicant.name) != -1
+        })
+      }
+      this.currentPage = 1
+    }
+  }
+}
+</script>

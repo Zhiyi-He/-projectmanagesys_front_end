@@ -86,13 +86,20 @@
 </template>
 
 <script>
+<<<<<<< HEAD
 import { getAppInfo, updateAppInfo } from "@/api/applicant";
 import { getUserInfo } from "@/api/user";
 import router from "@/router";
+=======
+import { getAppInfo, updateAppInfo } from '@/api/applicant'
+import { getUserInfo } from '@/api/user'
+import router from '@/router'
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 export default {
   data() {
     return {
       appInfo: {
+<<<<<<< HEAD
         id: "",
         name: "",
         idCard: "",
@@ -125,6 +132,40 @@ export default {
     this.fetchData();
   }
 };
+=======
+        id: '',
+        name: '',
+        idCard: '',
+        folk: '',
+        edu: '',
+        profession: '',
+        birthday: '',
+        tel: '',
+        email: '',
+        proNum: '',
+        desc: ''
+      }
+    }
+  },
+  methods: {
+    onSubmit() {
+      updateAppInfo(this.appInfo)
+    },
+    onCancel() {
+      this.fetchData()
+    },
+    fetchData() {
+      getUserInfo().then(response => {
+        const { userVo } = response
+        this.appInfo = userVo
+      })
+    }
+  },
+  created() {
+    this.fetchData()
+  }
+}
+>>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>
 
 <style lang='scss' scoped>
