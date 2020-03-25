@@ -4,9 +4,10 @@ import {
     , Form, Input, FormItem, Message, Col, Scrollbar, Menu, MenuItem, Breadcrumb,
     BreadcrumbItem, Dropdown, DropdownItem, DropdownMenu, Submenu, Table, TableColumn,
     Select, Option, DatePicker, TimePicker, Switch, CheckboxGroup, Checkbox, RadioGroup,
-    Radio, Alert, Tree, Loading,
+    Radio, Alert, Tree, Loading, Cascader, Upload, MessageBox, Steps, Step, Dialog,
 } from 'element-ui'
 
+Vue.use(Dialog)
 Vue.use(Button)
 Vue.use(Container)
 Vue.use(header)
@@ -44,4 +45,9 @@ Vue.use(Radio)
 Vue.use(Alert)
 Vue.use(Tree)
 Vue.use(Loading)
+Vue.use(Cascader)
+Vue.use(Upload)
+Vue.use(Steps)
+Vue.use(Step)
 Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox.confirm

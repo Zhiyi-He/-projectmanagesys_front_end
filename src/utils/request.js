@@ -2,10 +2,11 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { BASEURL } from '@/variables'
 
 // create an axios instance
 const service = axios.create({
-  baseURL: 'http://localhost:8080/'
+  baseURL: BASEURL
   // baseURL: 'https://www.studyinghome.com/mock/5e611fc0597ac8103c4760e7/'
 })
 
@@ -31,6 +32,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   response => {
     const res = response.data
+    console.log(res.data)
 
     // // if the custom code is not 20000, it is judged as an error.
     if (res.meta.code !== 20000) {
@@ -41,7 +43,7 @@ service.interceptors.response.use(
       })
 
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.meta.code === 50012 || res.meta.code === 50012 || res.meta.code === 50014) {
+      if (res.meta.code === 50008 || res.meta.code === 50012 || res.meta.code === 50014) {
         // to re-login
         MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
           confirmButtonText: 'Re-Login',

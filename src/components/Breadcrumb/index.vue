@@ -37,31 +37,29 @@ export default {
       );
       const first = matched[0];
 
-      if (!this.isDashboard(first)) {
-        matched = [{ path: "/dashboard", meta: { title: "Dashboard" } }].concat(
-          matched
-        );
-      }
+      // if (!this.isDashboard(first)) {
+      //   matched = [{ path: "/index", meta: { title: "首页" } }].concat(matched);
+      // }
 
       this.levelList = matched.filter(
         item => item.meta && item.meta.title && item.meta.breadcrumb !== false
       );
     },
-    isDashboard(route) {
-      const name = route && route.name;
-      if (!name) {
-        return false;
-      }
-      return (
-        name.trim().toLocaleLowerCase() === "Dashboard".toLocaleLowerCase()
-      );
-    },
-    pathCompile(path) {
-      // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
-      const { params } = this.$route;
-      var toPath = pathToRegexp.compile(path);
-      return toPath(params);
-    },
+    // isDashboard(route) {
+    //   const name = route && route.name;
+    //   if (!name) {
+    //     return false;
+    //   }
+    //   return (
+    //     name.trim().toLocaleLowerCase() === "Dashboard".toLocaleLowerCase()
+    //   );
+    // },
+    // pathCompile(path) {
+    //   // To solve this problem https://github.com/PanJiaChen/vue-element-admin/issues/561
+    //   const { params } = this.$route;
+    //   var toPath = pathToRegexp.compile(path);
+    //   return toPath(params);
+    // },
     handleLink(item) {
       const { redirect, path } = item;
       if (redirect) {

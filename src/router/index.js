@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import { APPLICANT, REPDEPT, RECDEPT, PROMANAGER, SYSMANAGER, EXPERT } from '@/variables'
 
 Vue.use(VueRouter)
 
@@ -8,11 +9,13 @@ import Layout from '../layout'
 const routes = [
   {
     path: '/',
-    redirect: '/home'
+    redirect: '/home',
+    hidden: true
   },
   {
     path: '/home',
-    component: () => import('@/views/home/index')
+    component: () => import('@/views/home/index'),
+    hidden: true
   },
 
   {
@@ -27,6 +30,7 @@ const routes = [
     hidden: true
   },
 
+  //首页路由
   {
     path: '/index',
     component: Layout,
@@ -35,115 +39,124 @@ const routes = [
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: '首页', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' },
+    }, {
+      path: 'updatePwd',
+      name: 'updatePwd',
+      component: () => import('@/views/dashboard/updatePwd'),
+      meta: { title: '修改密码' },
+      hidden: true
+    },
+    {
+      path: 'message',
+      name: 'message',
+      component: () => import('@/views/dashboard/index'),
+      meta: { title: '消息中心', icon: 'dashboard' },
+      hidden: true
     }]
   },
 
+  //申报人路由
   {
-    path: '/example',
+    path: '/applicantInfo',
     component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-    meta: { title: '案例', icon: 'example' },
+    redirect: '/applicantInfo/appInfo',
+    name: 'applicantInfo',
+    meta: { title: '申报人信息', icon: 'example', subsystem: APPLICANT },
     children: [
       {
-        path: 'table',
-        name: 'Table',
-        component: () => import('@/views/table/index'),
-        meta: { title: '表', icon: 'table' }
+        path: 'appInfo',
+        name: 'appInfo',
+        component: () => import('@/views/applicant/info/appInfo'),
+        meta: { title: '个人信息管理', icon: 'form', subsystem: APPLICANT }
       },
       {
-        path: 'tree',
-        name: 'Tree',
-        component: () => import('@/views/tree/index'),
-        meta: { title: '树', icon: 'tree' }
-      }
+        path: 'projectTable',
+        name: 'projectTable',
+        component: () => import('@/views/applicant/info/projectTable'),
+        meta: { title: '项目管理', icon: 'table', subsystem: APPLICANT }
+      },
     ]
   },
 
   {
-    path: '/form',
+    path: '/projectApply',
     component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: '表单', icon: 'form' }
-      }
-    ]
-  },
-
-  {
-    path: '/nested',
-    component: Layout,
-    redirect: '/nested/menu1',
-    name: 'Nested',
+    redirect: '/projectApply/basicInfo',
+    name: 'projectApply',
     meta: {
-      title: '级联',
-      icon: 'nested'
+      title: '项目申请管理',
+      icon: 'nested', subsystem: APPLICANT
     },
     children: [
       {
-        path: 'menu1',
-        component: () => import('@/views/nested/menu1/index'), // Parent router-view
-        name: 'Menu1',
+        path: 'basicInfo',
+        component: () => import('@/views/applicant/projectApply/basicInfo'), // Parent router-view
+        name: 'basicInfo',
         meta: {
-          title: '菜单1'
+          title: '项目基本信息', icon: 'form', subsystem: APPLICANT
         },
-        children: [
-          {
-            path: 'menu1-1',
-            component: () => import('@/views/nested/menu1/menu1-1'),
-            name: 'Menu1-1',
-            meta: { title: '菜单1-1' }
-          },
-          {
-            path: 'menu1-2',
-            component: () => import('@/views/nested/menu1/menu1-2'),
-            name: 'Menu1-2',
-            meta: { title: '菜单1-2' },
-            children: [
-              {
-                path: 'menu1-2-1',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-                name: 'Menu1-2-1',
-                meta: { title: '菜单1-2-1' }
-              },
-              {
-                path: 'menu1-2-2',
-                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-                name: 'Menu1-2-2',
-                meta: { title: '菜单1-2-2' }
-              }
-            ]
-          },
-          {
-            path: 'menu1-3',
-            component: () => import('@/views/nested/menu1/menu1-3'),
-            name: 'Menu1-3',
-            meta: { title: '菜单1-3' }
-          }
-        ]
       },
       {
-        path: 'menu2',
-        component: () => import('@/views/nested/menu2/index'),
-        meta: { title: '菜单2' }
+        path: 'projectContent',
+        component: () => import('@/views/applicant/projectApply/projectContent'), // Parent router-view
+        name: 'projectContent',
+        meta: {
+          title: '项目内容', icon: 'form', subsystem: APPLICANT
+        },
+      },
+      {
+        path: 'fileUpload',
+        component: () => import('@/views/applicant/projectApply/fileUpload'), // Parent router-view
+        name: 'fileUpload',
+        meta: {
+          title: '项目文件提交', icon: 'form', subsystem: APPLICANT
+        },
+      },
+      {
+        path: 'projectApp',
+        component: () => import('@/views/applicant/projectApply/projectApp'), // Parent router-view
+        name: 'projectApp',
+        meta: {
+          title: '项目申报', icon: 'form', subsystem: APPLICANT
+        },
       }
     ]
   },
 
+  //申报单位路由
   {
-    path: '/external-link',
+    path: '/repdeptInfo',
     component: Layout,
+    redirect: '/repdeptInfo/rpdInfo',
+    name: 'repdeptInfo',
+    meta: { title: '申报单位信息', icon: 'example', subsystem: REPDEPT },
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: '外部链接', icon: 'link' }
-      }
+        path: 'rpdInfo',
+        name: 'rpdInfo',
+        component: () => import('@/views/repDept/info/rpdInfo'),
+        meta: { title: '单位信息管理', icon: 'form', subsystem: REPDEPT }
+      },
+      {
+        path: 'appAccount',
+        name: 'appAccount',
+        component: () => import('@/views/repDept/info/appAccount'),
+        meta: { title: '申报人账号管理', icon: 'table', subsystem: REPDEPT }
+      },
     ]
   },
+
+  // {
+  //   path: '/external-link',
+  //   component: Layout,
+  //   children: [
+  //     {
+  //       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+  //       meta: { title: '外部链接', icon: 'link' }
+  //     }
+  //   ]
+  // },
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

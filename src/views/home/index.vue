@@ -50,9 +50,9 @@
           <el-button type="primary" @click="login('sysManager')">系统管理员入口</el-button>
           <el-button type="primary" @click="login('expert')">评审专家入口</el-button>
         </el-row>
-        <el-row>
+        <!-- <el-row>
           <el-button type="primary" @click="login('doubleDept')">组织单位兼申报单位入口</el-button>
-        </el-row>
+        </el-row>-->
       </div>
     </el-main>
     <el-footer style="height:80px">
@@ -75,7 +75,8 @@ import {
   PROMANAGER,
   SYSMANAGER,
   EXPERT,
-  DOUBLEDEPT
+  NOTICEURL,
+  MANUALURL
 } from "@/variables";
 export default {
   data() {
@@ -90,8 +91,8 @@ export default {
         { id: 4, title: "组织单位兼申报单位使用说明", date: "2020-2-15" },
         { id: 5, title: "系统管理员使用说明", date: "2020-2-15" }
       ],
-      noticeUrl: "http://localhost:8080/download/?parentPath=notice&filename=",
-      manualUrl: "http://localhost:8080/download/?parentPath=manual&filename="
+      noticeUrl: NOTICEURL,
+      manualUrl: MANUALURL
     };
   },
 
@@ -120,9 +121,9 @@ export default {
         case EXPERT:
           loginName = "评审专家";
           break;
-        case DOUBLEDEPT:
-          loginName = "组织单位兼申报单位";
-          break;
+        // case DOUBLEDEPT:
+        //   loginName = "组织单位兼申报单位";
+        //   break;
       }
       this.$router.push({
         path: "/login",
@@ -297,11 +298,11 @@ export default {
     .el-button {
       font-weight: 550;
     }
-    :last-child {
-      .el-button {
-        width: 300px; //300px 45.3%
-      }
-    }
+    // :last-child {
+    //   .el-button {
+    //     width: 300px; //300px 45.3%
+    //   }
+    // }
   }
 }
 </style> 

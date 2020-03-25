@@ -1,4 +1,4 @@
-import { APPLICANT, REPDEPT, RECDEPT, PROMANAGER, SYSMANAGER, EXPERT, DOUBLEDEPT } from '@/variables'
+import { APPLICANT, REPDEPT, RECDEPT, PROMANAGER, SYSMANAGER, EXPERT } from '@/variables'
 
 let jumpUrl;
 
@@ -8,23 +8,28 @@ export default function jump(userType) {
       jumpUrl = '/index';
       break;
     case REPDEPT:
-      jumpUrl = '/example/table'
+      // jumpUrl = '/example/table'
+      jumpUrl = '/index';
       break
     case RECDEPT:
-      jumpUrl = '/example/tree'
+      // jumpUrl = '/example/tree'
+      jumpUrl = '/index';
       break
     case PROMANAGER:
-      jumpUrl = '/form/index'
+      // jumpUrl = '/form/index'
+      jumpUrl = '/index';
       break
     case SYSMANAGER:
-      jumpUrl = '/nested/menu1/menu1-1'
+      // jumpUrl = '/nested/menu1/menu1-1'
+      jumpUrl = '/index';
       break
     case EXPERT:
-      jumpUrl = '/nested/menu1/menu1-3'
+      // jumpUrl = '/nested/menu1/menu1-3'
+      jumpUrl = '/index';
       break
-    case DOUBLEDEPT:
-      jumpUrl = '/nested/menu2'
-      break
+    // case DOUBLEDEPT:
+    //   jumpUrl = '/nested/menu2'
+    //   break
     default:
       jumpUrl = '/404'
       break;

@@ -80,13 +80,13 @@ export default {
   data() {
     return {
       loginForm: {
-        username: "admin",
+        username: "xiaobao520",
         password: "123456"
       },
       loginRules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 8, message: "请输入正确的用户名", trigger: "blur" }
+          { min: 3, max: 15, message: "请输入正确的用户名", trigger: "blur" }
         ],
         password: [
           { required: true, message: "请输入密码", trigger: "blur" },
@@ -107,7 +107,7 @@ export default {
         // this.redirect = to.query && to.query.redirect;
         if (to.query.redirect == undefined) {
           store.dispatch("user/setLogin", to.query);
-          this.redirect = jump(to.query.loginParam);
+          // this.redirect = jump(to.query.loginParam);
         } else {
           this.redirect = to.query && to.query.redirect;
         }

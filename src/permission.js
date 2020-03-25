@@ -25,12 +25,13 @@ router.beforeEach(async (to, from, next) => {
     if (hasGetUserInfo) {
       if (whiteList[0].indexOf(to.path) !== -1 && to.query.loginParam == userType) {
         store.dispatch("user/setLogin", to.query);
-        let jumpUrl = jump(userType)
-        next(jumpUrl)
+        // let jumpUrl = jump(userType)
+        next("/index")
       }
       next()
     } else {
       try {
+        console.log('get userinfo')
         await store.dispatch('user/getUserInfo')
         next()
       } catch (error) {

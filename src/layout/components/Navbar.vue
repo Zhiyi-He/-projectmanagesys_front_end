@@ -21,12 +21,12 @@
           <router-link to="/">
             <el-dropdown-item>主页</el-dropdown-item>
           </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
-            <el-dropdown-item>Github</el-dropdown-item>
-          </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>文档</el-dropdown-item>
-          </a>
+          <router-link to="/index/updatePwd">
+            <el-dropdown-item>修改密码</el-dropdown-item>
+          </router-link>
+          <router-link to="/index/message">
+            <el-dropdown-item>消息中心</el-dropdown-item>
+          </router-link>
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">注销</span>
           </el-dropdown-item>
@@ -54,7 +54,7 @@ export default {
       this.$store.dispatch("app/toggleSideBar");
     },
     async logout() {
-      // await this.$store.dispatch("user/logout");
+      await this.$store.dispatch("user/logout");
       this.$router.push(`/login?redirect=${this.$route.fullPath}`);
     }
   }
