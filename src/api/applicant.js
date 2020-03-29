@@ -70,8 +70,7 @@ export function updateProjects(projects) {
     return res;
 }
 
-export function getLaterProject(applicant, proStatus) {
-    console.log(applicant)
+export function getProjectsByProStatus(applicant, proStatus) {
     const res = request({
         url: 'applicant/projects/' + proStatus,
         method: 'post',

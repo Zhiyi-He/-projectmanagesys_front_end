@@ -26,5 +26,5 @@ module.exports = {
     //申报单位状态
     NOTPASSRPD: 0,          //审核未通过
     UNDEREVIEW: 1,           //申报单位待审核
-    PASS2RPD: 2,            //审核通过
+    PASSRPD: 2,            //审核通过
 }

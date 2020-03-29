@@ -80,7 +80,11 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getLaterProject, updateProjects, getAppInfo } from '@/api/applicant'
+import {
+  getProjectsByProStatus,
+  updateProjects,
+  getAppInfo
+} from '@/api/applicant'
 import router from '@/router'
 import { PROJECTUPDATE, FIRSTREVIEW } from '@/variables'
 export default {
@@ -114,7 +118,7 @@ export default {
     },
     async fetchData() {
       const { userVo } = await getUserInfo()
-      const { projects } = await getLaterProject(userVo, PROJECTUPDATE)
+      const { projects } = await getProjectsByProStatus(userVo, PROJECTUPDATE)
       if (projects.length != 0) {
         this.projectInfo = projects[0]
       } else {

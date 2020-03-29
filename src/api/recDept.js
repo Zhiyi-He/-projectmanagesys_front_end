@@ -9,6 +9,24 @@ export function getRcdInfo(rcdId) {
     return res;
 }
 
+export function addRecDept(recDept) {
+    const res = request({
+        url: 'recDept/recDept',
+        method: 'post',
+        data: recDept
+    });
+    return res;
+}
+
+export function deleteRecDepts(recDepts) {
+    const res = request({
+        url: 'recDept/recDepts',
+        method: 'delete',
+        data: recDepts
+    });
+    return res;
+}
+
 export function updateRcdInfo(rcdInfo) {
     const res = request({
         url: 'recDept/rcdInfo',
@@ -26,9 +44,9 @@ export function getRepDepts(rcdId) {
     return res;
 }
 
-export function getDeptList() {
+export function getRecDepts() {
     const res = request({
-        url: 'recDept/deptList',
+        url: 'recDept/recDepts',
         method: 'get',
     });
     return res;

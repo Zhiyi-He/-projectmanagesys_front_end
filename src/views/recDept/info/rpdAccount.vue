@@ -89,8 +89,7 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import {} from '@/api/applicant'
-import { deleteRepDepts, updateRpdInfo, addRepDept } from '@/api/repDept'
+import { deleteRepDepts, updateRepDepts, addRepDept } from '@/api/repDept'
 import { getRepDepts, getRcdInfo } from '@/api/recDept'
 import { UNDEREVIEW } from '@/variables'
 export default {
@@ -158,8 +157,8 @@ export default {
     },
     async editRow(repDept) {
       repDept.rpdStatus = UNDEREVIEW
-      const { updateUser } = await updateRpdInfo(repDept)
-      if (updateUser != null) {
+      const { updateUsers } = await updateRepDepts([repDept])
+      if (updateUsers != null) {
         this.$message({
           message: '修改申报单位账号成功！',
           type: 'success'
@@ -200,7 +199,7 @@ export default {
     },
     multipleSelectionTip() {
       this.$message({
-        message: '请选择申报人',
+        message: '请选择申报单位',
         type: 'warning'
       })
     },

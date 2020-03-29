@@ -27,11 +27,11 @@ export function deleteRepDepts(repDepts) {
     return res;
 }
 
-export function updateRpdInfo(rpdInfo) {
+export function updateRepDepts(repDepts) {
     const res = request({
-        url: 'repDept/rpdInfo',
+        url: 'repDept/repDept',
         method: 'put',
-        data: rpdInfo
+        data: repDepts
     });
     return res;
 }
@@ -44,11 +44,10 @@ export function getApplicants(rpdId) {
     return res;
 }
 
-export function getProjectsByProStatus(applicant, proStatus) {
-    console.log(applicant);
-    // const res = request({
-    //     url: 'repDept/projects/' + proStatus,
-    //     method: 'get',
-    // });
-    // return res;
+export function getRepDeptsByRpdStatus(status) {
+    const res = request({
+        url: 'repDept/repDepts/' + status,
+        method: 'get',
+    });
+    return res;
 }

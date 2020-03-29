@@ -77,64 +77,64 @@ import {
   EXPERT,
   NOTICEURL,
   MANUALURL
-} from "@/variables";
+} from '@/variables'
 export default {
   data() {
     return {
       sysNotices: [
-        { id: 1, title: "项目申请书下册内容填写模板", date: "2020-2-15" }
+        { id: 1, title: '项目申请书下册内容填写模板', date: '2020-2-15' }
       ],
       sysManual: [
-        { id: 1, title: "申报单位使用说明", date: "2020-2-15" },
-        { id: 2, title: "项目管理员使用说明", date: "2020-2-15" },
-        { id: 3, title: "组织推荐单位使用说明", date: "2020-2-15" },
-        { id: 4, title: "组织单位兼申报单位使用说明", date: "2020-2-15" },
-        { id: 5, title: "系统管理员使用说明", date: "2020-2-15" }
+        { id: 1, title: '申报单位使用说明', date: '2020-2-15' },
+        { id: 2, title: '项目管理员使用说明', date: '2020-2-15' },
+        { id: 3, title: '组织推荐单位使用说明', date: '2020-2-15' },
+        { id: 4, title: '组织单位兼申报单位使用说明', date: '2020-2-15' },
+        { id: 5, title: '系统管理员使用说明', date: '2020-2-15' }
       ],
       noticeUrl: NOTICEURL,
       manualUrl: MANUALURL
-    };
+    }
   },
 
   methods: {
     backHome() {
-      this.$router.push("/home");
+      this.$router.push('/home')
     },
     login(name) {
-      var loginName = "";
-      switch (name) {
-        case APPLICANT:
-          loginName = "申报人";
-          break;
-        case REPDEPT:
-          loginName = "申报单位";
-          break;
-        case RECDEPT:
-          loginName = "组织推荐单位";
-          break;
-        case PROMANAGER:
-          loginName = "项目管理员";
-          break;
-        case SYSMANAGER:
-          loginName = "系统管理员";
-          break;
-        case EXPERT:
-          loginName = "评审专家";
-          break;
-        // case DOUBLEDEPT:
-        //   loginName = "组织单位兼申报单位";
-        //   break;
-      }
+      var loginName = ''
+      // switch (name) {
+      //   case APPLICANT:
+      //     loginName = '申报人'
+      //     break
+      //   case REPDEPT:
+      //     loginName = '申报单位'
+      //     break
+      //   case RECDEPT:
+      //     loginName = '组织推荐单位'
+      //     break
+      //   case PROMANAGER:
+      //     loginName = '项目管理员'
+      //     break
+      //   case SYSMANAGER:
+      //     loginName = '系统管理员'
+      //     break
+      //   case EXPERT:
+      //     loginName = '评审专家'
+      //     break
+      // case DOUBLEDEPT:
+      //   loginName = "组织单位兼申报单位";
+      //   break;
+      // }
       this.$router.push({
-        path: "/login",
+        path: '/login',
         query: {
-          loginName: loginName,
+          // loginName: loginName,
           loginParam: name
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang='scss' scoped>

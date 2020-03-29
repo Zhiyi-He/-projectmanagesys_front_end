@@ -15,10 +15,8 @@
       <el-table-column prop="proType" label="项目类型"></el-table-column>
       <el-table-column prop="proName" label="项目名称"></el-table-column>
       <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column prop="rpdName" label="单位科室"></el-table-column>
-      <el-table-column prop="rcdName" label="所属单位"></el-table-column>
-      <el-table-column prop="funds" label="项目经费" sortable></el-table-column>
-      <el-table-column prop="appName" label="申报人"></el-table-column>
+      <el-table-column prop="funds" label="项目经费（元）" sortable></el-table-column>
+      <el-table-column prop="time" label="研究年限（年）"></el-table-column>
       <el-table-column
         prop="proStatus"
         label="申报状态"
@@ -69,12 +67,6 @@ export default {
           const { proList } = response
 
           this.tableData = proList
-          for (var i = 0; i < proList.length; i++) {
-            this.tableData[i].appName = proList[i].applicant.name
-            this.tableData[i].rpdName = proList[i].applicant.repDept.deptName
-            this.tableData[i].rcdName =
-              proList[i].applicant.repDept.recDept.deptName
-          }
           this.listLoading = false
         })
       })

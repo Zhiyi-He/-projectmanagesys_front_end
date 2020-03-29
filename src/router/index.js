@@ -195,7 +195,7 @@ const routes = [
   {
     path: '/rpdProjectReview',
     component: Layout,
-    redirect: '/rcdProjectReview/rpdsReviewTable',
+    redirect: '/rpdProjectReview/rpdsReviewTable',
     name: 'rpdProjectReview',
     meta: { title: '项目审核', icon: 'nested', subsystem: RECDEPT },
     children: [
@@ -210,6 +210,63 @@ const routes = [
         name: 'rpdsProjectTable',
         component: () => import('@/views/recDept/projectReview/projectTable'),
         meta: { title: '项目列表', icon: 'table', subsystem: RECDEPT }
+      },
+    ]
+  },
+
+  //项目管理员路由
+  {
+    path: '/deptManage',
+    component: Layout,
+    redirect: '/deptManage/rpdInfoReview',
+    name: 'deptManage',
+    meta: { title: '组织推荐单位信息', icon: 'example', subsystem: PROMANAGER },
+    children: [
+      {
+        path: 'rpdInfoReview',
+        name: 'rpdInfoReview',
+        component: () => import('@/views/proManager/deptManage/rpdInfoReview'),
+        meta: { title: '申报单位信息审核', icon: 'table', subsystem: PROMANAGER }
+      },
+      {
+        path: 'rcdAccount',
+        name: 'rcdAccount',
+        component: () => import('@/views/proManager/deptManage/rcdAccount'),
+        meta: { title: '组织推荐单位账号管理', icon: 'table', subsystem: PROMANAGER }
+      },
+      {
+        path: 'expAccount',
+        name: 'expAccount',
+        component: () => import('@/views/proManager/deptManage/expAccount'),
+        meta: { title: '专家账号管理', icon: 'table', subsystem: PROMANAGER }
+      },
+    ]
+  },
+
+  {
+    path: '/rcdProjectReview',
+    component: Layout,
+    redirect: '/rcdProjectReview/rcdsReviewTable',
+    name: 'rcdProjectReview',
+    meta: { title: '项目审核', icon: 'nested', subsystem: PROMANAGER },
+    children: [
+      {
+        path: 'rcdsReviewTable',
+        name: 'rcdsReviewTable',
+        component: () => import('@/views/proManager/projectReview/reviewTable'),
+        meta: { title: '待审核项目列表', icon: 'table', subsystem: PROMANAGER }
+      },
+      {
+        path: 'expAssign',
+        name: 'expAssign',
+        component: () => import('@/views/proManager/projectReview/expAssign'),
+        meta: { title: '专家分配', icon: 'table', subsystem: PROMANAGER }
+      },
+      {
+        path: 'rcdsProjectTable',
+        name: 'rcdsProjectTable',
+        component: () => import('@/views/proManager/projectReview/projectTable'),
+        meta: { title: '项目列表', icon: 'table', subsystem: PROMANAGER }
       },
     ]
   },

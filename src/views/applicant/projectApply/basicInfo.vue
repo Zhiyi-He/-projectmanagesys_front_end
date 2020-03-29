@@ -66,7 +66,7 @@
 import {
   addProject,
   getAppInfo,
-  getLaterProject,
+  getProjectsByProStatus,
   deleteProject
 } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
@@ -91,7 +91,7 @@ export default {
   methods: {
     async onSubmit() {
       const { userVo } = await getUserInfo()
-      const { projects } = await getLaterProject(userVo, PROJECTUPDATE)
+      const { projects } = await getProjectsByProStatus(userVo, PROJECTUPDATE)
       if (projects.length != 0) {
         await deleteProject(projects[0].id)
       }

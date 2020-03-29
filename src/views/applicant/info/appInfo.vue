@@ -112,7 +112,6 @@
 <script>
 import { getAppInfo, updateAppInfo } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
-import { getDeptList } from '@/api/recDept'
 import router from '@/router'
 export default {
   data() {

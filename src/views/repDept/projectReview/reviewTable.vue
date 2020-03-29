@@ -150,7 +150,7 @@
 
 <script>
 import { getApplicants } from '@/api/repDept'
-import { getLaterProject, updateProjects } from '@/api/applicant'
+import { getProjectsByProStatus, updateProjects } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
 import { FIRSTREVIEW, NOTPASS, BACKMODIFY, SECONDREVIEW } from '@/variables'
 export default {
@@ -196,7 +196,7 @@ export default {
           text: applicants[index].name,
           value: applicants[index].name
         })
-        const { projects } = await getLaterProject(
+        const { projects } = await getProjectsByProStatus(
           applicants[index],
           FIRSTREVIEW
         )

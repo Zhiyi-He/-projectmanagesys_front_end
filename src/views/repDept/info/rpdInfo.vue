@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { getRpdInfo, updateRpdInfo } from '@/api/repDept'
+import { getRpdInfo, updateRepDepts } from '@/api/repDept'
 import { getUserInfo } from '@/api/user'
 import router from '@/router'
 export default {
@@ -127,8 +127,8 @@ export default {
   },
   methods: {
     async onSubmit(rpdInfo) {
-      const { updateUser } = await updateRpdInfo(rpdInfo)
-      if (updateUser != null) {
+      const { updateUsers } = await updateRepDepts([rpdInfo])
+      if (updateUsers != null) {
         this.$message({
           message: '修改用户信息成功！',
           type: 'success'
