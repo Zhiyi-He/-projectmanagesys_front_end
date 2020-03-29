@@ -79,15 +79,6 @@ export default {
   data() {
     return {
       loginForm: {
-<<<<<<< HEAD
-        username: "xiaobao520",
-        password: "123456"
-      },
-      loginRules: {
-        username: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          { min: 3, max: 15, message: "请输入正确的用户名", trigger: "blur" }
-=======
         username: 'xiaobao520',
         password: '123456'
       },
@@ -95,7 +86,6 @@ export default {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 15, message: '请输入正确的用户名', trigger: 'blur' }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },
@@ -104,8 +94,7 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined,
-      jumpUrl: ''
+      redirect: undefined
     }
   },
   watch: {
@@ -115,11 +104,7 @@ export default {
         // 回调函数，两个参数，to：当前的组件，from：上一个组件
         // this.redirect = to.query && to.query.redirect;
         if (to.query.redirect == undefined) {
-<<<<<<< HEAD
-          store.dispatch("user/setLogin", to.query);
-=======
           store.dispatch('user/setLogin', to.query.loginParam)
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           // this.redirect = jump(to.query.loginParam);
         } else {
           this.redirect = to.query && to.query.redirect

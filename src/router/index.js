@@ -76,8 +76,6 @@ const routes = [
         component: () => import('@/views/applicant/info/projectTable'),
         meta: { title: '项目管理', icon: 'table', subsystem: APPLICANT }
       },
-<<<<<<< HEAD
-=======
     ]
   },
 
@@ -123,55 +121,11 @@ const routes = [
           title: '项目申报', icon: 'form', subsystem: APPLICANT
         },
       }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     ]
   },
 
   //申报单位路由
   {
-<<<<<<< HEAD
-    path: '/projectApply',
-    component: Layout,
-    redirect: '/projectApply/basicInfo',
-    name: 'projectApply',
-    meta: {
-      title: '项目申请管理',
-      icon: 'nested', subsystem: APPLICANT
-    },
-    children: [
-      {
-        path: 'basicInfo',
-        component: () => import('@/views/applicant/projectApply/basicInfo'), // Parent router-view
-        name: 'basicInfo',
-        meta: {
-          title: '项目基本信息', icon: 'form', subsystem: APPLICANT
-        },
-      },
-      {
-        path: 'projectContent',
-        component: () => import('@/views/applicant/projectApply/projectContent'), // Parent router-view
-        name: 'projectContent',
-        meta: {
-          title: '项目内容', icon: 'form', subsystem: APPLICANT
-        },
-      },
-      {
-        path: 'fileUpload',
-        component: () => import('@/views/applicant/projectApply/fileUpload'), // Parent router-view
-        name: 'fileUpload',
-        meta: {
-          title: '项目文件提交', icon: 'form', subsystem: APPLICANT
-        },
-      },
-      {
-        path: 'projectApp',
-        component: () => import('@/views/applicant/projectApply/projectApp'), // Parent router-view
-        name: 'projectApp',
-        meta: {
-          title: '项目申报', icon: 'form', subsystem: APPLICANT
-        },
-      }
-=======
     path: '/repDeptInfo',
     component: Layout,
     redirect: '/repDeptInfo/rpdInfo',
@@ -190,31 +144,10 @@ const routes = [
         component: () => import('@/views/repDept/info/appAccount'),
         meta: { title: '申报人账号管理', icon: 'table', subsystem: REPDEPT }
       },
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     ]
   },
 
-  //申报单位路由
   {
-<<<<<<< HEAD
-    path: '/repdeptInfo',
-    component: Layout,
-    redirect: '/repdeptInfo/rpdInfo',
-    name: 'repdeptInfo',
-    meta: { title: '申报单位信息', icon: 'example', subsystem: REPDEPT },
-    children: [
-      {
-        path: 'rpdInfo',
-        name: 'rpdInfo',
-        component: () => import('@/views/repDept/info/rpdInfo'),
-        meta: { title: '单位信息管理', icon: 'form', subsystem: REPDEPT }
-      },
-      {
-        path: 'appAccount',
-        name: 'appAccount',
-        component: () => import('@/views/repDept/info/appAccount'),
-        meta: { title: '申报人账号管理', icon: 'table', subsystem: REPDEPT }
-=======
     path: '/appProjectReview',
     component: Layout,
     redirect: '/projectReview/appsReviewTable',
@@ -277,7 +210,6 @@ const routes = [
         name: 'rpdsProjectTable',
         component: () => import('@/views/recDept/projectReview/projectTable'),
         meta: { title: '项目列表', icon: 'table', subsystem: RECDEPT }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
       },
     ]
   },

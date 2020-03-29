@@ -63,11 +63,6 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-import { addProject, getAppInfo } from "@/api/applicant";
-import { getUserInfo } from "@/api/user";
-import router from "@/router";
-=======
 import {
   addProject,
   getAppInfo,
@@ -77,64 +72,11 @@ import {
 import { getUserInfo } from '@/api/user'
 import router from '@/router'
 import { PROJECTUPDATE } from '@/variables'
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 export default {
   data() {
     return {
       active: 0,
       basicInfo: {
-<<<<<<< HEAD
-        proName: "",
-        proType: "",
-        subject: ""
-      },
-      deptInfo: {
-        address: "",
-        postalCode: "",
-        deptName: ""
-      }
-    };
-  },
-  methods: {
-    onSubmit() {
-      getUserInfo().then(response => {
-        const { user } = response;
-        addProject({
-          project: this.basicInfo,
-          appId: user.id
-        }).then(response => {
-          const { project } = response;
-          if (project != null) {
-            this.$message({
-              message: "添加项目基本信息成功！",
-              type: "success"
-            });
-            this.$router.push("/projectApply/projectContent");
-          }
-        });
-      });
-    },
-    onCancel(basicInfo) {
-      this.$refs[basicInfo].resetFields();
-    },
-    fetchData() {
-      getUserInfo().then(response => {
-        const { user } = response;
-        getAppInfo(user.id).then(response => {
-          const { user } = response;
-          const { repDept } = user;
-          this.deptInfo = repDept;
-          this.deptInfo.deptName =
-            user.repDept.recDept.deptName + "/" + user.repDept.deptName;
-        });
-      });
-    }
-  },
-  created() {
-    this.fetchData();
-  }
-};
-=======
         proName: '',
         proType: '',
         subject: ''
@@ -182,7 +124,6 @@ export default {
     this.fetchData()
   }
 }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>
 
 <style lang='scss' scoped>

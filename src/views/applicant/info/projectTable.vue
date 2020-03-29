@@ -10,12 +10,8 @@
       highlight-current-row
       :default-sort="{prop: 'id', order: 'ascending'}"
     >
-<<<<<<< HEAD
-      <el-table-column prop="id" label="编号" sortable></el-table-column>
-=======
       <el-table-column type="index" label="序号"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
       <el-table-column prop="proType" label="项目类型"></el-table-column>
       <el-table-column prop="proName" label="项目名称"></el-table-column>
       <el-table-column prop="subject" label="学科分类"></el-table-column>
@@ -44,19 +40,6 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-import { getUserInfo } from "@/api/user";
-import { getProList } from "@/api/applicant";
-export default {
-  data() {
-    const statusFilter = [
-      { text: "未通过", value: 1 },
-      { text: "打回修改", value: 2 },
-      { text: "初级审核中", value: 3 },
-      { text: "二级审核中", value: 4 },
-      { text: "已通过", value: 5 }
-    ];
-=======
 import { getUserInfo } from '@/api/user'
 import { getProList } from '@/api/applicant'
 export default {
@@ -68,49 +51,10 @@ export default {
       { text: '二级审核中', value: 4 },
       { text: '已通过', value: 5 }
     ]
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     return {
       statusFilter: statusFilter,
       tableData: [],
       listLoading: true
-<<<<<<< HEAD
-    };
-  },
-  created() {
-    this.fetchData();
-  },
-  methods: {
-    fetchData() {
-      this.listLoading = true;
-      getUserInfo().then(response => {
-        const { user } = response;
-        getProList(user.id).then(response => {
-          const { proList } = response;
-
-          this.tableData = proList;
-          for (var i = 0; i < proList.length; i++) {
-            this.tableData[i].appName = proList[i].applicant.name;
-            this.tableData[i].rpdName = proList[i].applicant.repDept.deptName;
-            this.tableData[i].rcdName =
-              proList[i].applicant.repDept.recDept.deptName;
-          }
-          this.listLoading = false;
-        });
-      });
-      this.listLoading = false;
-    },
-    deleteRow(index, rows) {
-      rows.splice(index, 1);
-    },
-    formatStatus(row, column) {
-      return this.statusFilter[row.proStatus - 1].text;
-    },
-    filterStatus(value, row) {
-      return row.proStatus == value;
-    }
-  }
-};
-=======
     }
   },
   created() {
@@ -147,5 +91,4 @@ export default {
     }
   }
 }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 </script>

@@ -68,13 +68,8 @@ const actions = {
     getUserInfo({ commit }) {
         return new Promise((resolve, reject) => {
             getUserInfo().then(response => {
-<<<<<<< HEAD
-                const { user } = response
-                const { username } = user
-=======
                 const { userVo } = response
                 const { username } = userVo
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 
                 if (!username) {
                     reject('Verification failed, please Login again.')

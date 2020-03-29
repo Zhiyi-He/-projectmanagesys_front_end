@@ -82,11 +82,7 @@
           </el-table-column>
           <el-table-column prop="tel" label="电话号码">
             <template slot-scope="scope">
-<<<<<<< HEAD
-              <el-input v-model="scope.row.name"></el-input>
-=======
               <el-input v-model="scope.row.tel"></el-input>
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
             </template>
           </el-table-column>
           <el-table-column prop="email" label="邮箱">
@@ -99,10 +95,7 @@
       <el-divider content-position="center">单位证明材料</el-divider>
       <el-form-item>
         <el-button type="primary" @click="onSubmit(rpdInfo)">提交</el-button>
-<<<<<<< HEAD
-=======
         <el-button @click="resetForm('rpdInfo')">重置</el-button>
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
       </el-form-item>
     </el-form>
   </div>
@@ -110,10 +103,7 @@
 
 <script>
 import { getRpdInfo, updateRpdInfo } from '@/api/repDept'
-<<<<<<< HEAD
-=======
 import { getUserInfo } from '@/api/user'
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 import router from '@/router'
 export default {
   data() {
@@ -137,26 +127,14 @@ export default {
   },
   methods: {
     async onSubmit(rpdInfo) {
-<<<<<<< HEAD
-      const { user } = await updateRpdInfo(rpdInfo)
-      if (user != null) {
-        this.$message({
-          message: '修改用户信息成功',
-=======
       const { updateUser } = await updateRpdInfo(rpdInfo)
       if (updateUser != null) {
         this.$message({
           message: '修改用户信息成功！',
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           type: 'success'
         })
       }
     },
-<<<<<<< HEAD
-    async fetchData() {
-      const { user } = await getRpdInfo()
-      this.rpdInfo = user
-=======
     resetForm(formName) {
       this.$refs[formName].resetFields()
     },
@@ -164,7 +142,6 @@ export default {
       const { userVo } = await getUserInfo()
       const { userInfo } = await getRpdInfo(userVo.id)
       this.rpdInfo = userInfo
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     }
   },
   created() {

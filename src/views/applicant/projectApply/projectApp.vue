@@ -79,15 +79,10 @@
 </template>
 
 <script>
-<<<<<<< HEAD
-import { getLaterProject, updateProject } from '@/api/applicant'
-import router from '@/router'
-=======
 import { getUserInfo } from '@/api/user'
 import { getLaterProject, updateProjects, getAppInfo } from '@/api/applicant'
 import router from '@/router'
 import { PROJECTUPDATE, FIRSTREVIEW } from '@/variables'
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 export default {
   data() {
     const options = [10000, 20000, 50000, 100000]
@@ -107,24 +102,6 @@ export default {
     }
   },
   methods: {
-<<<<<<< HEAD
-    onSubmit(projectInfo) {
-      updateProject(projectInfo, this.active).then(response => {
-        const { project } = response
-        if (project != null) {
-          this.$message({
-            message: '项目申报成功！可在项目列表中查看已申报项目',
-            type: 'success'
-          })
-        }
-      })
-    },
-    fetchData() {
-      getLaterProject().then(response => {
-        const { project } = response
-        this.projectInfo = project
-      })
-=======
     async onSubmit(projectInfo) {
       projectInfo.proStatus = FIRSTREVIEW
       const { updatePros } = await updateProjects([projectInfo])
@@ -146,7 +123,6 @@ export default {
           type: 'error'
         })
       }
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
     }
   },
   created() {

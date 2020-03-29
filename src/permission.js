@@ -23,11 +23,7 @@ router.beforeEach(async (to, from, next) => {
     store.dispatch("user/setLogin", userType);
     if (hasGetUserInfo) {
       if (whiteList[0].indexOf(to.path) !== -1 && to.query.loginParam == userType) {
-<<<<<<< HEAD
-        store.dispatch("user/setLogin", to.query);
-=======
         // store.dispatch("user/setLogin", to.query.loginParam);
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
         // let jumpUrl = jump(userType)
         next("/index")
       }

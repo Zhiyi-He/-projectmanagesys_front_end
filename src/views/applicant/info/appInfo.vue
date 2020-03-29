@@ -143,13 +143,8 @@ export default {
       // appInfo.sex = Number(appInfo.sex);
       console.log(appInfo)
       updateAppInfo(appInfo).then(response => {
-<<<<<<< HEAD
-        const { user } = response
-        if (user != null) {
-=======
         const { updateUser } = response
         if (updateUser != null) {
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           this.$message({
             message: '修改个人成功！',
             type: 'success'
@@ -162,13 +157,8 @@ export default {
     },
     fetchData() {
       getUserInfo().then(response => {
-<<<<<<< HEAD
-        const { user } = response
-        getAppInfo(user.id).then(response => {
-=======
         const { userVo } = response
         getAppInfo(userVo.id).then(response => {
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
           const { user } = response
           this.appInfo = user
           this.deptName =

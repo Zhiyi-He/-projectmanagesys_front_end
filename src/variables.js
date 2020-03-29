@@ -8,11 +8,6 @@ module.exports = {
     SYSMANAGER: 'sysManager',
     EXPERT: 'expert',
     // DOUBLEDEPT: 'doubleDept',
-<<<<<<< HEAD
-    NOTICEURL: 'http://localhost:8080/files/download/?parentPath=notice&filename=',
-    MANUALURL: 'http://localhost:8080/files/download/?parentPath=manual&filename=',
-    BASEURL: 'http://localhost:8080/'
-=======
 
     //URL常量
     NOTICEURL: 'http://localhost:8080/files/download/?parentPath=notice&filename=',
@@ -32,5 +27,4 @@ module.exports = {
     NOTPASSRPD: 0,          //审核未通过
     UNDEREVIEW: 1,           //申报单位待审核
     PASS2RPD: 2,            //审核通过
->>>>>>> 3.29 组织推荐单位子系统，完善表格分页，筛选等功能，代码优化
 }
