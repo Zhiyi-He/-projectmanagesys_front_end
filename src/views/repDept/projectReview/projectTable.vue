@@ -132,18 +132,26 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getProList } from '@/api/applicant'
+import { getProjectsByStatus } from '@/api/applicant'
 import { getApplicants } from '@/api/repDept'
+import { NOTPASS, FIRSTREVIEW, SECONDREVIEW, PASS } from '@/variables'
 export default {
   data() {
+    const statusList = [NOTPASS, FIRSTREVIEW, SECONDREVIEW, PASS]
     const statusFilter = [
       { text: '未通过', value: 1 },
       { text: '打回修改', value: 2 },
       { text: '初级审核中', value: 3 },
       { text: '二级审核中', value: 4 },
-      { text: '已通过', value: 5 }
-    ]
+      { text: '三级审核中', value: 5 },
+      { text: '待分配专家', value: 6 },
+      { text: '专家评审', value: 7 },
+      { text: '已通过', value: 8 }
+    ].filter(status => {
+      return statusList.indexOf(status.value) != -1
+    })
     return {
+      statusList: statusList,
       statusFilter: statusFilter,
       appNameFilter: [],
       projectTable: [],
@@ -178,21 +186,23 @@ export default {
       this.listLoading = true
       const { userVo } = await getUserInfo()
       const { applicants } = await getApplicants(userVo.id)
-      for (let index = 0; index < applicants.length; index++) {
+      for (const applicant of applicants) {
         this.appNameFilter.push({
-          text: applicants[index].name,
-          value: applicants[index].name
+          text: applicant.name,
+          value: applicant.name
         })
-        const { proList } = await getProList(applicants[index].id)
-        this.firstData = this.projectTable = this.projectTable.concat(proList)
+        const { projects } = await getProjectsByStatus({
+          applicant: applicant,
+          status: this.statusList
+        })
+        this.firstData = this.projectTable = this.projectTable.concat(projects)
       }
       this.listLoading = false
     },
     formatStatus(row, column) {
-      return this.statusFilter[row.proStatus - 1].text
-    },
-    filterStatus(value, row) {
-      return row.proStatus == value
+      return this.statusFilter.filter(status => {
+        return status.value == row.proStatus
+      })[0].text
     },
     filterAppName(value, row) {
       return row.applicant.name == value

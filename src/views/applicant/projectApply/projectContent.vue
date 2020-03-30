@@ -145,7 +145,7 @@
 <script>
 import { getUserInfo } from '@/api/user'
 import {
-  getProjectsByProStatus,
+  getProjectsByStatus,
   updateProjects,
   getAppInfo
 } from '@/api/applicant'
@@ -203,7 +203,10 @@ export default {
     },
     async fetchData() {
       const { userVo } = await getUserInfo()
-      const { projects } = await getProjectsByProStatus(userVo, PROJECTUPDATE)
+      const { projects } = await getProjectsByStatus({
+        applicant: userVo,
+        status: [PROJECTUPDATE]
+      })
       if (projects.length != 0) {
         this.projectContent = projects[0]
         this.projectContent.applicant.schoolAndEdu =

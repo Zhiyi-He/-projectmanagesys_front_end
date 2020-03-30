@@ -271,6 +271,45 @@ const routes = [
     ]
   },
 
+  //评审专家路由
+  {
+    path: '/expertInfo',
+    component: Layout,
+    redirect: '/expertInfo/expInfo',
+    name: 'expertInfo',
+    meta: { title: '评审专家信息', icon: 'example', subsystem: EXPERT },
+    children: [
+      {
+        path: 'expInfo',
+        name: 'expInfo',
+        component: () => import('@/views/expert/info/expInfo'),
+        meta: { title: '专家信息管理', icon: 'form', subsystem: EXPERT }
+      }
+    ]
+  },
+
+  {
+    path: '/expProjectReview',
+    component: Layout,
+    redirect: '/expProjectReview/expReviewTable',
+    name: 'expProjectReview',
+    meta: { title: '项目审核', icon: 'nested', subsystem: EXPERT },
+    children: [
+      {
+        path: 'expReviewTable',
+        name: 'expReviewTable',
+        component: () => import('@/views/expert/projectReview/reviewTable'),
+        meta: { title: '待审核项目列表', icon: 'table', subsystem: EXPERT }
+      },
+      {
+        path: 'expProjectTable',
+        name: 'expProjectTable',
+        component: () => import('@/views/expert/projectReview/projectTable'),
+        meta: { title: '项目列表', icon: 'table', subsystem: EXPERT }
+      },
+    ]
+  },
+
   // {
   //   path: '/external-link',
   //   component: Layout,

@@ -1,21 +1,27 @@
 <template>
   <div class="app-container">
+    <el-button
+      @click="multipleSelection.length==0?multipleSelectionTip():pass(multipleSelection)"
+      icon="el-icon-check"
+      type="primary"
+      plain
+    >批量分配</el-button>
     <el-table
       v-loading="listLoading"
-      :data="projectTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="assignTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
+      @selection-change="handleSelectionChange"
       @filter-change="filterProjectTable"
     >
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
       <el-table-column prop="proType" label="项目类型"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
       <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column prop="funds" label="项目经费（元）" sortable></el-table-column>
-      <el-table-column prop="time" label="研究年限（年）" sortable></el-table-column>
       <el-table-column
         prop="applicant.name"
         label="申报人"
@@ -29,19 +35,14 @@
         :column-key="'rpdName'"
       ></el-table-column>
       <el-table-column
-        prop="proStatus"
-        label="申报状态"
-        :filters="statusFilter"
-        :column-key="'proStatus'"
-        :formatter="formatStatus"
+        prop="applicant.repDept.recDept.deptName"
+        label="推荐单位"
+        :filters="rcdNameFilter"
+        :column-key="'rcdName'"
       ></el-table-column>
-      <el-table-column fixed="right" label="操作">
+      <el-table-column fixed="right" label="操作" width="220px">
         <template slot-scope="scope">
-          <el-button
-            @click="dialogFormVisible=true,projectDetails=scope.row"
-            type="text"
-            size="small"
-          >查看详情</el-button>
+          <el-button @click="pass([scope.row])" type="text" size="small">分配</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -53,141 +54,26 @@
       :page-sizes="pageSizes"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="projectTable.length"
+      :total="assignTable.length"
     ></el-pagination>
-
-    <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
-      <el-form
-        label-position="left"
-        ref="projectDetails"
-        :model="projectDetails"
-        label-width="120px"
-        :disabled="true"
-      >
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目编号：" prop="id">
-              <el-input v-model="projectDetails.id" :disabled="true" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目名称：" prop="proName">
-              <el-input v-model="projectDetails.proName" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="项目类型：" prop="proType">
-              <el-input v-model="projectDetails.proType" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="学科分类：" prop="subject">
-              <el-input v-model="projectDetails.subject" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="项目经费：" prop="funds">
-              <el-input v-model="projectDetails.funds" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="研究年限：" prop="time">
-              <el-input v-model="projectDetails.time" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="申报人：" prop="applicant.name">
-              <el-input v-model="projectDetails.applicant.name" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="申报单位：" prop="applicant.repDept.deptName">
-              <el-input v-model="projectDetails.applicant.repDept.deptName" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="关键词：" prop="keywords">
-              <el-input v-model="projectDetails.keywords" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目内容摘要" prop="desc">
-              <el-input v-model="projectDetails.desc" type="textarea" placeholder="300字以内" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目文件" prop="desc">
-              <el-input v-model="projectDetails.desc" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <!-- <el-button type="primary" @click="pass([projectDetails])">通过</el-button> -->
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getUserInfo } from '@/api/user'
-import { getProList } from '@/api/applicant'
+import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { getApplicants } from '@/api/repDept'
-import { getRepDepts } from '@/api/recDept'
-import { PASSRPD } from '@/variables'
+import { getRecDepts, getRepDepts } from '@/api/recDept'
+import { PASSRPD, EXPERTASSIGN, EXPERTREVIEW } from '@/variables'
 export default {
   data() {
-    const statusFilter = [
-      { text: '未通过', value: 1 },
-      { text: '打回修改', value: 2 },
-      { text: '初级审核中', value: 3 },
-      { text: '二级审核中', value: 4 },
-      { text: '已通过', value: 5 }
-    ]
     return {
-      statusFilter: statusFilter,
       appNameFilter: [],
       rpdNameFilter: [],
-      projectTable: [],
+      rcdNameFilter: [],
+      assignTable: [],
       firstData: [],
       listLoading: true,
-      dialogFormVisible: false,
-      projectDetails: {
-        id: '',
-        proName: '',
-        proType: '',
-        subject: '',
-        funds: 0,
-        time: 0,
-        keywords: '',
-        desc: '',
-        applicant: {
-          name: '',
-          repDept: {
-            deptName: ''
-          }
-        }
-      },
+      multipleSelection: [],
       pageSize: 5,
       currentPage: 1,
       pageSizes: [5, 10, 15, 20]
@@ -204,31 +90,83 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { userVo } = await getUserInfo()
-      const { repDepts } = await getRepDepts(userVo.id)
-      for (const repDept of repDepts) {
-        if (repDept.rpdStatus == PASSRPD) {
-          this.rpdNameFilter.push({
-            text: repDept.deptName,
-            value: repDept.deptName
-          })
-          const { applicants } = await getApplicants(repDept.id)
-          for (const applicant of applicants) {
-            this.appNameFilter.push({
-              text: applicant.name,
-              value: applicant.name
+      this.resetTableData()
+      const { recDepts } = await getRecDepts()
+      for (const recDept of recDepts) {
+        this.rcdNameFilter.push({
+          text: recDept.deptName,
+          value: recDept.deptName
+        })
+        const { repDepts } = await getRepDepts(recDept.id)
+        for (const repDept of repDepts) {
+          if (repDept.rpdStatus == PASSRPD) {
+            this.rpdNameFilter.push({
+              text: repDept.deptName,
+              value: repDept.deptName
             })
-            const { proList } = await getProList(applicant.id)
-            this.firstData = this.projectTable = this.projectTable.concat(
-              proList
-            )
+            const { applicants } = await getApplicants(repDept.id)
+            for (const applicant of applicants) {
+              this.appNameFilter.push({
+                text: applicant.name,
+                value: applicant.name
+              })
+              const { projects } = await getProjectsByStatus({
+                applicant: applicant,
+                status: [EXPERTASSIGN]
+              })
+              this.firstData = this.assignTable = this.assignTable.concat(
+                projects
+              )
+            }
           }
         }
       }
+
       this.listLoading = false
     },
-    formatStatus(row, column) {
-      return this.statusFilter[row.proStatus - 1].text
+    review(projects, msg, confirmMsg) {
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async () => {
+          const { updatePros } = await updateProjects(projects)
+          if (updatePros.length != 0) {
+            this.$message({
+              message: confirmMsg,
+              type: 'success'
+            })
+            this.fetchData()
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消'
+          })
+        })
+    },
+    pass(projects) {
+      projects.forEach(project => {
+        project.proStatus = EXPERTREVIEW
+      })
+      this.review(projects, '是否要分配专家到该项目', '分配专家成功！')
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    multipleSelectionTip() {
+      this.$message({
+        message: '请选择项目',
+        type: 'warning'
+      })
+    },
+    resetTableData() {
+      this.assignTable = []
+      this.appNameFilter = []
+      this.rpdNameFilter = []
+      this.rcdNameFilter = []
     },
     handleSizeChange(val) {
       this.pageSize = val
@@ -238,22 +176,26 @@ export default {
       this.currentPage = val
     },
     filterProjectTable(filters) {
-      this.projectTable = this.firstData
+      this.assignTable = this.firstData
 
       if (filters.appName && filters.appName.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
+        this.assignTable = this.assignTable.filter(project => {
           return filters.appName.indexOf(project.applicant.name) != -1
         })
       }
-      if (filters.proStatus && filters.proStatus.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return filters.proStatus.indexOf(project.proStatus) != -1
-        })
-      }
       if (filters.rpdName && filters.rpdName.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
+        this.assignTable = this.assignTable.filter(project => {
           return (
             filters.rpdName.indexOf(project.applicant.repDept.deptName) != -1
+          )
+        })
+      }
+      if (filters.rcdName && filters.rcdName.length != 0) {
+        this.assignTable = this.assignTable.filter(project => {
+          return (
+            filters.rcdName.indexOf(
+              project.applicant.repDept.recDept.deptName
+            ) != -1
           )
         })
       }

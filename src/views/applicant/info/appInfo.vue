@@ -18,7 +18,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="10" :offset="2">
-          <el-form-item label="身份证号：" prop="sex">
+          <el-form-item label="性别：" prop="sex">
             <el-select v-model="appInfo.sex" placeholder="请选择性别">
               <el-option label="男" :value="0" />
               <el-option label="女" :value="1" />

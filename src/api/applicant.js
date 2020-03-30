@@ -70,11 +70,11 @@ export function updateProjects(projects) {
     return res;
 }
 
-export function getProjectsByProStatus(applicant, proStatus) {
+export function getProjectsByStatus(data) {
     const res = request({
-        url: 'applicant/projects/' + proStatus,
+        url: 'applicant/projects',
         method: 'post',
-        data: applicant
+        data: data
     });
     return res;
 }

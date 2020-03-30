@@ -34,7 +34,6 @@
       <el-table-column prop="proType" label="项目类型"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
       <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column prop="funds" label="项目经费（元）" sortable></el-table-column>
       <el-table-column
         prop="applicant.name"
         label="申报人"
@@ -46,6 +45,12 @@
         label="申报单位"
         :filters="rpdNameFilter"
         :column-key="'rpdName'"
+      ></el-table-column>
+      <el-table-column
+        prop="applicant.repDept.recDept.deptName"
+        label="推荐单位"
+        :filters="rcdNameFilter"
+        :column-key="'rcdName'"
       ></el-table-column>
       <el-table-column fixed="right" label="操作" width="220px">
         <template slot-scope="scope">
@@ -136,6 +141,14 @@
 
         <el-row>
           <el-col :span="22">
+            <el-form-item label="推荐单位：" prop="applicant.repDept.recDept.deptName">
+              <el-input v-model="projectDetails.applicant.repDept.recDept.deptName" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row>
+          <el-col :span="22">
             <el-form-item label="关键词：" prop="keywords">
               <el-input v-model="projectDetails.keywords" />
             </el-form-item>
@@ -167,22 +180,22 @@
 </template>
 
 <script>
-import { getUserInfo } from '@/api/user'
-import { getProjectsByProStatus, updateProjects } from '@/api/applicant'
+import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { getApplicants } from '@/api/repDept'
-import { getRepDepts, getRcdInfo } from '@/api/recDept'
+import { getRecDepts, getRepDepts } from '@/api/recDept'
 import {
   PASSRPD,
   NOTPASS,
   BACKMODIFY,
-  SECONDREVIEW,
-  FINALREVIEW
+  THREEREVIEW,
+  EXPERTASSIGN
 } from '@/variables'
 export default {
   data() {
     return {
       appNameFilter: [],
       rpdNameFilter: [],
+      rcdNameFilter: [],
       reviewTable: [],
       firstData: [],
       listLoading: true,
@@ -200,7 +213,10 @@ export default {
         applicant: {
           name: '',
           repDept: {
-            deptName: ''
+            deptName: '',
+            recDept: {
+              deptName: ''
+            }
           }
         }
       },
@@ -220,31 +236,38 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      this.reviewTable = []
-      const { userVo } = await getUserInfo()
-      const { repDepts } = await getRepDepts(userVo.id)
-      for (const repDept of repDepts) {
-        if (repDept.rpdStatus == PASSRPD) {
-          this.rpdNameFilter.push({
-            text: repDept.deptName,
-            value: repDept.deptName
-          })
-          const { applicants } = await getApplicants(repDept.id)
-          for (const applicant of applicants) {
-            this.appNameFilter.push({
-              text: applicant.name,
-              value: applicant.name
+      this.resetTableData()
+      const { recDepts } = await getRecDepts()
+      for (const recDept of recDepts) {
+        this.rcdNameFilter.push({
+          text: recDept.deptName,
+          value: recDept.deptName
+        })
+        const { repDepts } = await getRepDepts(recDept.id)
+        for (const repDept of repDepts) {
+          if (repDept.rpdStatus == PASSRPD) {
+            this.rpdNameFilter.push({
+              text: repDept.deptName,
+              value: repDept.deptName
             })
-            const { projects } = await getProjectsByProStatus(
-              applicant,
-              SECONDREVIEW
-            )
-            this.firstData = this.reviewTable = this.reviewTable.concat(
-              projects
-            )
+            const { applicants } = await getApplicants(repDept.id)
+            for (const applicant of applicants) {
+              this.appNameFilter.push({
+                text: applicant.name,
+                value: applicant.name
+              })
+              const { projects } = await getProjectsByStatus({
+                applicant: applicant,
+                status: [THREEREVIEW]
+              })
+              this.firstData = this.reviewTable = this.reviewTable.concat(
+                projects
+              )
+            }
           }
         }
       }
+
       this.listLoading = false
     },
     review(projects, msg, confirmMsg) {
@@ -285,7 +308,7 @@ export default {
     },
     pass(projects) {
       projects.forEach(project => {
-        project.proStatus = FINALREVIEW
+        project.proStatus = EXPERTASSIGN
       })
       this.review(projects, '是否要通过该项目', '通过该项目成功！')
     },
@@ -297,6 +320,12 @@ export default {
         message: '请选择项目',
         type: 'warning'
       })
+    },
+    resetTableData() {
+      this.reviewTable = []
+      this.appNameFilter = []
+      this.rpdNameFilter = []
+      this.rcdNameFilter = []
     },
     handleSizeChange(val) {
       this.pageSize = val
@@ -317,6 +346,15 @@ export default {
         this.reviewTable = this.reviewTable.filter(project => {
           return (
             filters.rpdName.indexOf(project.applicant.repDept.deptName) != -1
+          )
+        })
+      }
+      if (filters.rcdName && filters.rcdName.length != 0) {
+        this.reviewTable = this.reviewTable.filter(project => {
+          return (
+            filters.rcdName.indexOf(
+              project.applicant.repDept.recDept.deptName
+            ) != -1
           )
         })
       }

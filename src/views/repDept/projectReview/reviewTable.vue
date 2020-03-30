@@ -150,7 +150,7 @@
 
 <script>
 import { getApplicants } from '@/api/repDept'
-import { getProjectsByProStatus, updateProjects } from '@/api/applicant'
+import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
 import { FIRSTREVIEW, NOTPASS, BACKMODIFY, SECONDREVIEW } from '@/variables'
 export default {
@@ -188,18 +188,18 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      this.reviewTable = []
+      this.resetTableData()
       const { userVo } = await getUserInfo()
       const { applicants } = await getApplicants(userVo.id)
-      for (let index = 0; index < applicants.length; index++) {
+      for (const applicant of applicants) {
         this.appNameFilter.push({
-          text: applicants[index].name,
-          value: applicants[index].name
+          text: applicant.name,
+          value: applicant.name
         })
-        const { projects } = await getProjectsByProStatus(
-          applicants[index],
-          FIRSTREVIEW
-        )
+        const { projects } = await getProjectsByStatus({
+          applicant: applicant,
+          status: [FIRSTREVIEW]
+        })
         this.firstData = this.reviewTable = this.reviewTable.concat(projects)
       }
       this.listLoading = false
@@ -254,6 +254,10 @@ export default {
         message: '请选择项目',
         type: 'warning'
       })
+    },
+    resetTableData() {
+      this.reviewTable = []
+      this.appNameFilter = []
     },
     handleSizeChange(val) {
       this.pageSize = val

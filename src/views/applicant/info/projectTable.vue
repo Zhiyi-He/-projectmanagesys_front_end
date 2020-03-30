@@ -47,7 +47,10 @@ export default {
       { text: '打回修改', value: 2 },
       { text: '初级审核中', value: 3 },
       { text: '二级审核中', value: 4 },
-      { text: '已通过', value: 5 }
+      { text: '三级审核中', value: 5 },
+      { text: '待分配专家', value: 6 },
+      { text: '专家评审', value: 7 },
+      { text: '已通过', value: 8 }
     ]
     return {
       statusFilter: statusFilter,

@@ -1,40 +1,21 @@
 <template>
   <div class="app-container">
-    <el-button
-      @click="multipleSelection.length==0?multipleSelectionTip():pass(multipleSelection)"
-      icon="el-icon-check"
-      type="primary"
-      plain
-    >批量通过</el-button>
-    <el-button
-      @click="multipleSelection.length==0?multipleSelectionTip():backModify(multipleSelection)"
-      icon="el-icon-edit"
-      type="warning"
-      plain
-    >批量打回修改</el-button>
-    <el-button
-      @click="multipleSelection.length==0?multipleSelectionTip():notPass(multipleSelection)"
-      icon="el-icon-close"
-      type="danger"
-      plain
-    >批量不通过</el-button>
     <el-table
       v-loading="listLoading"
-      :data="reviewTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="projectTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
       element-loading-text="Loading"
       border
       fit
       highlight-current-row
-      @selection-change="handleSelectionChange"
       @filter-change="filterProjectTable"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
       <el-table-column prop="proType" label="项目类型"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
       <el-table-column prop="subject" label="学科分类"></el-table-column>
       <el-table-column prop="funds" label="项目经费（元）" sortable></el-table-column>
+      <el-table-column prop="time" label="研究年限（年）" sortable></el-table-column>
       <el-table-column
         prop="applicant.name"
         label="申报人"
@@ -47,11 +28,15 @@
         :filters="rpdNameFilter"
         :column-key="'rpdName'"
       ></el-table-column>
-      <el-table-column fixed="right" label="操作" width="220px">
+      <el-table-column
+        prop="proStatus"
+        label="申报状态"
+        :filters="statusFilter"
+        :column-key="'proStatus'"
+        :formatter="formatStatus"
+      ></el-table-column>
+      <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-          <el-button @click="notPass([scope.row])" type="text" size="small">不通过</el-button>
-          <el-button @click="backModify([scope.row])" type="text" size="small">打回修改</el-button>
-          <el-button @click="pass([scope.row])" type="text" size="small">通过</el-button>
           <el-button
             @click="dialogFormVisible=true,projectDetails=scope.row"
             type="text"
@@ -68,7 +53,7 @@
       :page-sizes="pageSizes"
       :page-size="pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="reviewTable.length"
+      :total="projectTable.length"
     ></el-pagination>
 
     <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
@@ -158,35 +143,41 @@
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="pass([projectDetails])">通过</el-button>
-        <el-button type="warning" @click="backModify([projectDetails])">打回修改</el-button>
-        <el-button type="danger" @click="notPass([projectDetails])">不通过</el-button>
+        <!-- <el-button type="primary" @click="pass([projectDetails])">通过</el-button> -->
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getUserInfo } from '@/api/user'
-import { getProjectsByStatus, updateProjects } from '@/api/applicant'
+import { getProjectsByStatus } from '@/api/applicant'
 import { getApplicants } from '@/api/repDept'
-import { getRepDepts, getRcdInfo } from '@/api/recDept'
-import {
-  PASSRPD,
-  NOTPASS,
-  BACKMODIFY,
-  SECONDREVIEW,
-  THREEREVIEW
-} from '@/variables'
+import { getRecDepts, getRepDepts } from '@/api/recDept'
+import { NOTPASS, EXPERTREVIEW, PASS, PASSRPD } from '@/variables'
 export default {
   data() {
+    const statusList = [NOTPASS, EXPERTREVIEW, PASS]
+    const statusFilter = [
+      { text: '未通过', value: 1 },
+      { text: '打回修改', value: 2 },
+      { text: '初级审核中', value: 3 },
+      { text: '二级审核中', value: 4 },
+      { text: '三级审核中', value: 5 },
+      { text: '待分配专家', value: 6 },
+      { text: '专家评审', value: 7 },
+      { text: '已通过', value: 8 }
+    ].filter(status => {
+      return statusList.indexOf(status.value) != -1
+    })
     return {
+      statusList: statusList,
+      statusFilter: statusFilter,
       appNameFilter: [],
       rpdNameFilter: [],
-      reviewTable: [],
+      rcdNameFilter: [],
+      projectTable: [],
       firstData: [],
       listLoading: true,
-      multipleSelection: [],
       dialogFormVisible: false,
       projectDetails: {
         id: '',
@@ -200,7 +191,10 @@ export default {
         applicant: {
           name: '',
           repDept: {
-            deptName: ''
+            deptName: '',
+            recDept: {
+              deptName: ''
+            }
           }
         }
       },
@@ -220,88 +214,42 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      this.resetTableData()
-      const { userVo } = await getUserInfo()
-      const { repDepts } = await getRepDepts(userVo.id)
-      for (const repDept of repDepts) {
-        if (repDept.rpdStatus == PASSRPD) {
-          this.rpdNameFilter.push({
-            text: repDept.deptName,
-            value: repDept.deptName
-          })
-          const { applicants } = await getApplicants(repDept.id)
-          for (const applicant of applicants) {
-            this.appNameFilter.push({
-              text: applicant.name,
-              value: applicant.name
+      const { recDepts } = await getRecDepts()
+      for (const recDept of recDepts) {
+        this.rcdNameFilter.push({
+          text: recDept.deptName,
+          value: recDept.deptName
+        })
+        const { repDepts } = await getRepDepts(recDept.id)
+        for (const repDept of repDepts) {
+          if (repDept.rpdStatus == PASSRPD) {
+            this.rpdNameFilter.push({
+              text: repDept.deptName,
+              value: repDept.deptName
             })
-            const { projects } = await getProjectsByStatus({
-              applicant: applicant,
-              status: [SECONDREVIEW]
-            })
-            this.firstData = this.reviewTable = this.reviewTable.concat(
-              projects
-            )
+            const { applicants } = await getApplicants(repDept.id)
+            for (const applicant of applicants) {
+              this.appNameFilter.push({
+                text: applicant.name,
+                value: applicant.name
+              })
+              const { projects } = await getProjectsByStatus({
+                applicant: applicant,
+                status: this.statusList
+              })
+              this.firstData = this.projectTable = this.projectTable.concat(
+                projects
+              )
+            }
           }
         }
       }
       this.listLoading = false
     },
-    review(projects, msg, confirmMsg) {
-      this.$confirm(msg, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async () => {
-          const { updatePros } = await updateProjects(projects)
-          if (updatePros.length != 0) {
-            this.$message({
-              message: confirmMsg,
-              type: 'success'
-            })
-            this.dialogFormVisible = false
-            this.fetchData()
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消'
-          })
-        })
-    },
-    notPass(projects) {
-      projects.forEach(project => {
-        project.proStatus = NOTPASS
-      })
-      this.review(projects, '是否要不通过该项目', '不通过该项目成功！')
-    },
-    backModify(projects) {
-      projects.forEach(project => {
-        project.proStatus = BACKMODIFY
-      })
-      this.review(projects, '是否要打回修改该项目', '打回修改该项目成功！')
-    },
-    pass(projects) {
-      projects.forEach(project => {
-        project.proStatus = THREEREVIEW
-      })
-      this.review(projects, '是否要通过该项目', '通过该项目成功！')
-    },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
-    },
-    multipleSelectionTip() {
-      this.$message({
-        message: '请选择项目',
-        type: 'warning'
-      })
-    },
-    resetTableData() {
-      this.reviewTable = []
-      this.appNameFilter = []
-      this.rpdNameFilter = []
+    formatStatus(row, column) {
+      return this.statusFilter.filter(status => {
+        return status.value == row.proStatus
+      })[0].text
     },
     handleSizeChange(val) {
       this.pageSize = val
@@ -311,17 +259,31 @@ export default {
       this.currentPage = val
     },
     filterProjectTable(filters) {
-      this.reviewTable = this.firstData
+      this.projectTable = this.firstData
 
       if (filters.appName && filters.appName.length != 0) {
-        this.reviewTable = this.reviewTable.filter(project => {
+        this.projectTable = this.projectTable.filter(project => {
           return filters.appName.indexOf(project.applicant.name) != -1
         })
       }
+      if (filters.proStatus && filters.proStatus.length != 0) {
+        this.projectTable = this.projectTable.filter(project => {
+          return filters.proStatus.indexOf(project.proStatus) != -1
+        })
+      }
       if (filters.rpdName && filters.rpdName.length != 0) {
-        this.reviewTable = this.reviewTable.filter(project => {
+        this.projectTable = this.projectTable.filter(project => {
           return (
             filters.rpdName.indexOf(project.applicant.repDept.deptName) != -1
+          )
+        })
+      }
+      if (filters.rcdName && filters.rcdName.length != 0) {
+        this.projectTable = this.projectTable.filter(project => {
+          return (
+            filters.rcdName.indexOf(
+              project.applicant.repDept.recDept.deptName
+            ) != -1
           )
         })
       }

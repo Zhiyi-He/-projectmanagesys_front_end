@@ -151,20 +151,27 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getProList } from '@/api/applicant'
+import { getProjectsByStatus } from '@/api/applicant'
 import { getApplicants } from '@/api/repDept'
 import { getRepDepts } from '@/api/recDept'
-import { PASSRPD } from '@/variables'
+import { NOTPASS, SECONDREVIEW, THREEREVIEW, PASS, PASSRPD } from '@/variables'
 export default {
   data() {
+    const statusList = [NOTPASS, SECONDREVIEW, THREEREVIEW, PASS]
     const statusFilter = [
       { text: '未通过', value: 1 },
       { text: '打回修改', value: 2 },
       { text: '初级审核中', value: 3 },
       { text: '二级审核中', value: 4 },
-      { text: '已通过', value: 5 }
-    ]
+      { text: '三级审核中', value: 5 },
+      { text: '待分配专家', value: 6 },
+      { text: '专家评审', value: 7 },
+      { text: '已通过', value: 8 }
+    ].filter(status => {
+      return statusList.indexOf(status.value) != -1
+    })
     return {
+      statusList: statusList,
       statusFilter: statusFilter,
       appNameFilter: [],
       rpdNameFilter: [],
@@ -218,9 +225,12 @@ export default {
               text: applicant.name,
               value: applicant.name
             })
-            const { proList } = await getProList(applicant.id)
+            const { projects } = await getProjectsByStatus({
+              applicant: applicant,
+              status: this.statusList
+            })
             this.firstData = this.projectTable = this.projectTable.concat(
-              proList
+              projects
             )
           }
         }
@@ -228,7 +238,9 @@ export default {
       this.listLoading = false
     },
     formatStatus(row, column) {
-      return this.statusFilter[row.proStatus - 1].text
+      return this.statusFilter.filter(status => {
+        return status.value == row.proStatus
+      })[0].text
     },
     handleSizeChange(val) {
       this.pageSize = val

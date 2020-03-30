@@ -1,9 +1,9 @@
 import request from '@/utils/request'
 
 
-export function getRcdInfo(rcdId) {
+export function getExpert(id) {
     const res = request({
-        url: 'recDept/rcdInfo/' + rcdId,
+        url: 'expert/expert/' + id,
         method: 'get',
     });
     return res;
