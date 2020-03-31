@@ -225,16 +225,8 @@ export default {
       const { repDepts } = await getRepDepts(userVo.id)
       for (const repDept of repDepts) {
         if (repDept.rpdStatus == PASSRPD) {
-          this.rpdNameFilter.push({
-            text: repDept.deptName,
-            value: repDept.deptName
-          })
           const { applicants } = await getApplicants(repDept.id)
           for (const applicant of applicants) {
-            this.appNameFilter.push({
-              text: applicant.name,
-              value: applicant.name
-            })
             const { projects } = await getProjectsByStatus({
               applicant: applicant,
               status: [SECONDREVIEW]
@@ -245,6 +237,7 @@ export default {
           }
         }
       }
+      this.setFilter(this.firstData)
       this.listLoading = false
     },
     review(projects, msg, confirmMsg) {
@@ -302,6 +295,41 @@ export default {
       this.reviewTable = []
       this.appNameFilter = []
       this.rpdNameFilter = []
+    },
+    setFilter(projects) {
+      for (const project of projects) {
+        if (
+          this.appNameFilter &&
+          !this.appNameFilter.some(item => item.value == project.applicant.name)
+        ) {
+          this.appNameFilter.push({
+            text: project.applicant.name,
+            value: project.applicant.name
+          })
+        }
+        if (
+          this.rpdNameFilter &&
+          !this.rpdNameFilter.some(
+            item => item.value == project.applicant.repDept.deptName
+          )
+        ) {
+          this.rpdNameFilter.push({
+            text: project.applicant.repDept.deptName,
+            value: project.applicant.repDept.deptName
+          })
+        }
+        if (
+          this.rcdNameFilter &&
+          !this.rcdNameFilter.some(
+            item => item.value == project.applicant.repDept.recDept.deptName
+          )
+        ) {
+          this.rcdNameFilter.push({
+            text: project.applicant.repDept.recDept.deptName,
+            value: project.applicant.repDept.recDept.deptName
+          })
+        }
+      }
     },
     handleSizeChange(val) {
       this.pageSize = val

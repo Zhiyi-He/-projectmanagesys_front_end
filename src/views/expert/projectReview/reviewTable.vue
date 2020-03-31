@@ -7,36 +7,39 @@
       border
       fit
       highlight-current-row
-      @selection-change="handleSelectionChange"
       @filter-change="filterProjectTable"
     >
-      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
-      <el-table-column prop="id" label="项目编号" sortable></el-table-column>
-      <el-table-column prop="proType" label="项目类型"></el-table-column>
-      <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
-      <el-table-column prop="subject" label="学科分类"></el-table-column>
+      <el-table-column prop="project.id" label="项目编号" sortable></el-table-column>
+      <el-table-column prop="project.proType" label="项目类型"></el-table-column>
+      <el-table-column prop="project.proName" width="150px" label="项目名称"></el-table-column>
+      <el-table-column prop="project.subject" label="学科分类"></el-table-column>
       <el-table-column
-        prop="applicant.name"
+        prop="project.applicant.name"
         label="申报人"
         :filters="appNameFilter"
         :column-key="'appName'"
       ></el-table-column>
       <el-table-column
-        prop="applicant.repDept.deptName"
+        prop="project.applicant.repDept.deptName"
         label="申报单位"
         :filters="rpdNameFilter"
         :column-key="'rpdName'"
       ></el-table-column>
       <el-table-column
-        prop="applicant.repDept.recDept.deptName"
+        prop="project.applicant.repDept.recDept.deptName"
         label="推荐单位"
         :filters="rcdNameFilter"
         :column-key="'rcdName'"
       ></el-table-column>
+      <el-table-column prop="score" label="评审分数">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.score"></el-input>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="操作" width="220px">
         <template slot-scope="scope">
-          <el-button type="text" size="small">评分</el-button>
+          <el-button type="text" size="small" @click="score(scope.row)">评分</el-button>
           <el-button
             @click="dialogFormVisible=true,projectDetails=scope.row"
             type="text"
@@ -62,104 +65,125 @@
         ref="projectDetails"
         :model="projectDetails"
         label-width="120px"
-        :disabled="true"
       >
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目编号：" prop="id">
-              <el-input v-model="projectDetails.id" :disabled="true" />
+            <el-form-item label="项目编号：" prop="project.id">
+              <el-input v-model="projectDetails.project.id" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目名称：" prop="proName">
-              <el-input v-model="projectDetails.proName" />
+            <el-form-item label="项目名称：" prop="project.proName">
+              <el-input v-model="projectDetails.project.proName" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="10">
-            <el-form-item label="项目类型：" prop="proType">
-              <el-input v-model="projectDetails.proType" />
+            <el-form-item label="项目类型：" prop="project.proType">
+              <el-input v-model="projectDetails.project.proType" :disabled="true" />
             </el-form-item>
           </el-col>
           <el-col :span="10" :offset="2">
-            <el-form-item label="学科分类：" prop="subject">
-              <el-input v-model="projectDetails.subject" />
+            <el-form-item label="学科分类：" prop="project.subject">
+              <el-input v-model="projectDetails.project.subject" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="10">
-            <el-form-item label="项目经费：" prop="funds">
-              <el-input v-model="projectDetails.funds" />
+            <el-form-item label="项目经费：" prop="project.funds">
+              <el-input v-model="projectDetails.project.funds" :disabled="true" />
             </el-form-item>
           </el-col>
           <el-col :span="10" :offset="2">
-            <el-form-item label="研究年限：" prop="time">
-              <el-input v-model="projectDetails.time" />
+            <el-form-item label="研究年限：" prop="project.time">
+              <el-input v-model="projectDetails.project.time" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="10">
-            <el-form-item label="申报人：" prop="applicant.name">
-              <el-input v-model="projectDetails.applicant.name" />
+            <el-form-item label="申报人：" prop="project.applicant.name">
+              <el-input v-model="projectDetails.project.applicant.name" :disabled="true" />
             </el-form-item>
           </el-col>
           <el-col :span="10" :offset="2">
-            <el-form-item label="申报单位：" prop="applicant.repDept.deptName">
-              <el-input v-model="projectDetails.applicant.repDept.deptName" />
+            <el-form-item label="申报单位：" prop="project.applicant.repDept.deptName">
+              <el-input
+                v-model="projectDetails.project.applicant.repDept.deptName"
+                :disabled="true"
+              />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="22">
-            <el-form-item label="关键词：" prop="keywords">
-              <el-input v-model="projectDetails.keywords" />
+            <el-form-item label="推荐单位：" prop="project.applicant.repDept.recDept.deptName">
+              <el-input
+                v-model="projectDetails.project.applicant.repDept.recDept.deptName"
+                :disabled="true"
+              />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="22">
-            <el-form-item label="关键词：" prop="keywords">
-              <el-input v-model="projectDetails.keywords" />
+            <el-form-item label="关键词：" prop="project.keywords">
+              <el-input v-model="projectDetails.project.keywords" :disabled="true" />
             </el-form-item>
           </el-col>
         </el-row>
 
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目内容摘要" prop="desc">
-              <el-input v-model="projectDetails.desc" type="textarea" placeholder="300字以内" />
+            <el-form-item label="项目内容摘要" prop="project.desc">
+              <el-input
+                :autosize="{ minRows: 2, maxRows: 4}"
+                v-model="projectDetails.project.desc"
+                type="textarea"
+                placeholder="300字以内"
+                :disabled="true"
+              />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目文件" prop="desc">
-              <el-input v-model="projectDetails.desc" />
+            <el-form-item label="项目文件" prop="project.desc">
+              <el-input
+                :autosize="{ minRows: 2, maxRows: 4}"
+                v-model="projectDetails.project.desc"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="评审分数" prop="score">
+              <el-input v-model="projectDetails.score" :disabled="false"></el-input>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="pass([projectDetails])">通过</el-button>
+        <el-button type="primary" @click="score(projectDetails)">评分</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { getProjectsByStatus, updateProjects } from '@/api/applicant'
-import { getApplicants } from '@/api/repDept'
-import { getRepDepts, getRecDepts } from '@/api/recDept'
+import { getUserInfo } from '@/api/user'
+import { getExpert } from '@/api/expert'
+import { updateScore } from '@/api/score'
 import { PASSRPD, EXPERTREVIEW } from '@/variables'
 export default {
   data() {
@@ -173,20 +197,23 @@ export default {
       multipleSelection: [],
       dialogFormVisible: false,
       projectDetails: {
-        id: '',
-        proName: '',
-        proType: '',
-        subject: '',
-        funds: 0,
-        time: 0,
-        keywords: '',
-        desc: '',
-        applicant: {
-          name: '',
-          repDept: {
-            deptName: '',
-            recDept: {
-              deptName: ''
+        score: 0,
+        project: {
+          id: '',
+          proName: '',
+          proType: '',
+          subject: '',
+          funds: 0,
+          time: 0,
+          keywords: '',
+          desc: '',
+          applicant: {
+            name: '',
+            repDept: {
+              deptName: '',
+              recDept: {
+                deptName: ''
+              }
             }
           }
         }
@@ -208,45 +235,63 @@ export default {
     async fetchData() {
       this.listLoading = true
       this.resetTableData()
-      const { recDepts } = await getRecDepts()
-      for (const recDept of recDepts) {
-        this.rcdNameFilter.push({
-          text: recDept.deptName,
-          value: recDept.deptName
-        })
-        const { repDepts } = await getRepDepts(recDept.id)
-        for (const repDept of repDepts) {
-          if (repDept.rpdStatus == PASSRPD) {
-            this.rpdNameFilter.push({
-              text: repDept.deptName,
-              value: repDept.deptName
-            })
-            const { applicants } = await getApplicants(repDept.id)
-            for (const applicant of applicants) {
-              this.appNameFilter.push({
-                text: applicant.name,
-                value: applicant.name
-              })
-              const { projects } = await getProjectsByStatus({
-                applicant: applicant,
-                status: [EXPERTREVIEW]
-              })
-              this.firstData = this.reviewTable = this.reviewTable.concat(
-                projects
-              )
-            }
-          }
+      const { userVo } = await getUserInfo()
+      const { userInfo } = await getExpert(userVo.id)
+      for (const score of userInfo.scores) {
+        if (score.score == 0) {
+          this.setFilter([score.project])
+          this.firstData = this.reviewTable = this.reviewTable.concat(score)
         }
       }
       this.listLoading = false
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val
+    async score(projectExpert) {
+      const { updateResult } = await updateScore(projectExpert)
+      if (updateResult != null) {
+        this.$message({
+          type: 'success',
+          message: '评分该项目成功！'
+        })
+        this.fetchData()
+      }
     },
     resetTableData() {
       this.reviewTable = []
       this.appNameFilter = []
       this.rpdNameFilter = []
+      this.dialogFormVisible = false
+    },
+    setFilter(projects) {
+      for (const project of projects) {
+        if (
+          !this.appNameFilter.some(item => item.value == project.applicant.name)
+        ) {
+          this.appNameFilter.push({
+            text: project.applicant.name,
+            value: project.applicant.name
+          })
+        }
+        if (
+          !this.rpdNameFilter.some(
+            item => item.value == project.applicant.repDept.deptName
+          )
+        ) {
+          this.rpdNameFilter.push({
+            text: project.applicant.repDept.deptName,
+            value: project.applicant.repDept.deptName
+          })
+        }
+        if (
+          !this.rcdNameFilter.some(
+            item => item.value == project.applicant.repDept.recDept.deptName
+          )
+        ) {
+          this.rcdNameFilter.push({
+            text: project.applicant.repDept.recDept.deptName,
+            value: project.applicant.repDept.recDept.deptName
+          })
+        }
+      }
     },
     handleSizeChange(val) {
       this.pageSize = val

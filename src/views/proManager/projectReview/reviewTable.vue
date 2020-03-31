@@ -239,23 +239,11 @@ export default {
       this.resetTableData()
       const { recDepts } = await getRecDepts()
       for (const recDept of recDepts) {
-        this.rcdNameFilter.push({
-          text: recDept.deptName,
-          value: recDept.deptName
-        })
         const { repDepts } = await getRepDepts(recDept.id)
         for (const repDept of repDepts) {
           if (repDept.rpdStatus == PASSRPD) {
-            this.rpdNameFilter.push({
-              text: repDept.deptName,
-              value: repDept.deptName
-            })
             const { applicants } = await getApplicants(repDept.id)
             for (const applicant of applicants) {
-              this.appNameFilter.push({
-                text: applicant.name,
-                value: applicant.name
-              })
               const { projects } = await getProjectsByStatus({
                 applicant: applicant,
                 status: [THREEREVIEW]
@@ -267,7 +255,7 @@ export default {
           }
         }
       }
-
+      this.setFilter(this.firstData)
       this.listLoading = false
     },
     review(projects, msg, confirmMsg) {
@@ -326,6 +314,38 @@ export default {
       this.appNameFilter = []
       this.rpdNameFilter = []
       this.rcdNameFilter = []
+    },
+    setFilter(projects) {
+      for (const project of projects) {
+        if (
+          !this.appNameFilter.some(item => item.value == project.applicant.name)
+        ) {
+          this.appNameFilter.push({
+            text: project.applicant.name,
+            value: project.applicant.name
+          })
+        }
+        if (
+          !this.rpdNameFilter.some(
+            item => item.value == project.applicant.repDept.deptName
+          )
+        ) {
+          this.rpdNameFilter.push({
+            text: project.applicant.repDept.deptName,
+            value: project.applicant.repDept.deptName
+          })
+        }
+        if (
+          !this.rcdNameFilter.some(
+            item => item.value == project.applicant.repDept.recDept.deptName
+          )
+        ) {
+          this.rcdNameFilter.push({
+            text: project.applicant.repDept.recDept.deptName,
+            value: project.applicant.repDept.recDept.deptName
+          })
+        }
+      }
     },
     handleSizeChange(val) {
       this.pageSize = val
