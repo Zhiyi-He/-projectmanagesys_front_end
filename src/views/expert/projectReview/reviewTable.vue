@@ -182,9 +182,10 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
+import { updateProjects } from '@/api/applicant'
 import { getExpert } from '@/api/expert'
-import { updateScore } from '@/api/score'
-import { PASSRPD, EXPERTREVIEW } from '@/variables'
+import { updateScore, getScoresByProject, deleteScores } from '@/api/score'
+import { PASSRPD, EXPERTREVIEW, PENDING, PASS, NOTPASS } from '@/variables'
 export default {
   data() {
     return {
@@ -248,6 +249,22 @@ export default {
     async score(projectExpert) {
       const { updateResult } = await updateScore(projectExpert)
       if (updateResult != null) {
+        const { scores } = await getScoresByProject(updateResult.project)
+        if (!scores.some(item => item.score == 0)) {
+          await deleteScores(scores)
+          updateResult.project.proStatus = PENDING
+          let totalScore = 0
+          for (const score of scores) {
+            totalScore += score.score
+          }
+          updateResult.project.score = totalScore / scores.length
+          if (updateResult.project.score > 60) {
+            updateResult.project.reviewResult = PASS
+          } else {
+            updateResult.project.reviewResult = NOTPASS
+          }
+          await updateProjects([updateResult.project])
+        }
         this.$message({
           type: 'success',
           message: '评分该项目成功！'

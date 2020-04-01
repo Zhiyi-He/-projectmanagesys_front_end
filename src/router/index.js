@@ -263,6 +263,12 @@ const routes = [
         meta: { title: '专家分配', icon: 'table', subsystem: PROMANAGER }
       },
       {
+        path: 'projectApprove',
+        name: 'projectApprove',
+        component: () => import('@/views/proManager/projectReview/projectApprove'),
+        meta: { title: '项目审批', icon: 'table', subsystem: PROMANAGER }
+      },
+      {
         path: 'rcdsProjectTable',
         name: 'rcdsProjectTable',
         component: () => import('@/views/proManager/projectReview/projectTable'),

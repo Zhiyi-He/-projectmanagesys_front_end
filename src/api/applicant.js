@@ -78,3 +78,11 @@ export function getProjectsByStatus(data) {
     });
     return res;
 }
+
+export function getProjectsByStatuss(statusList) {
+    const res = request({
+        url: 'applicant/projects/' + statusList,
+        method: 'get',
+    });
+    return res;
+}

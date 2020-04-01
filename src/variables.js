@@ -23,7 +23,8 @@ module.exports = {
     THREEREVIEW: 5,          //三级审核--项目管理员
     EXPERTASSIGN: 6,          //待分配专家--项目管理员
     EXPERTREVIEW: 7,          //专家评审
-    PASS: 8,                 //项目已通过
+    PENDING: 8,                //项目待审批
+    PASS: 9,                 //项目已通过
 
     //申报单位状态
     NOTPASSRPD: 0,          //审核未通过

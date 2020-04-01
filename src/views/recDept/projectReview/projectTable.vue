@@ -166,7 +166,8 @@ export default {
       { text: '三级审核中', value: 5 },
       { text: '待分配专家', value: 6 },
       { text: '专家评审', value: 7 },
-      { text: '已通过', value: 8 }
+      { text: '待审批', value: 8 },
+      { text: '已通过', value: 9 }
     ].filter(status => {
       return statusList.indexOf(status.value) != -1
     })

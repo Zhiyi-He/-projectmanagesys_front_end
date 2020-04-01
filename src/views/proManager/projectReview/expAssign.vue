@@ -60,9 +60,7 @@
 </template>
 
 <script>
-import { getProjectsByStatus, updateProjects } from '@/api/applicant'
-import { getApplicants } from '@/api/repDept'
-import { getRecDepts, getRepDepts } from '@/api/recDept'
+import { getProjectsByStatuss, updateProjects } from '@/api/applicant'
 import { PASSRPD, EXPERTASSIGN, EXPERTREVIEW } from '@/variables'
 export default {
   data() {
@@ -90,25 +88,8 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      this.resetTableData()
-      const { recDepts } = await getRecDepts()
-      for (const recDept of recDepts) {
-        const { repDepts } = await getRepDepts(recDept.id)
-        for (const repDept of repDepts) {
-          if (repDept.rpdStatus == PASSRPD) {
-            const { applicants } = await getApplicants(repDept.id)
-            for (const applicant of applicants) {
-              const { projects } = await getProjectsByStatus({
-                applicant: applicant,
-                status: [EXPERTASSIGN]
-              })
-              this.firstData = this.assignTable = this.assignTable.concat(
-                projects
-              )
-            }
-          }
-        }
-      }
+      const { projects } = await getProjectsByStatuss([EXPERTASSIGN])
+      this.firstData = this.assignTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false
     },

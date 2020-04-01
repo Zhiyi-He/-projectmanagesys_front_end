@@ -1,5 +1,11 @@
 <template>
   <div class="app-container">
+    <el-button
+      @click="multipleSelection.length==0?multipleSelectionTip():approve(multipleSelection)"
+      icon="el-icon-check"
+      type="primary"
+      plain
+    >批量审批</el-button>
     <el-table
       v-loading="listLoading"
       ref="projectTable"
@@ -8,8 +14,10 @@
       border
       fit
       highlight-current-row
+      @selection-change="handleSelectionChange"
       @filter-change="filterProjectTable"
     >
+      <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
       <el-table-column prop="proType" label="项目类型"></el-table-column>
@@ -34,19 +42,15 @@
         :column-key="'rcdName'"
       ></el-table-column>
       <el-table-column
-        prop="proStatus"
-        label="申报状态"
+        prop="reviewResult"
+        label="评审结果"
         :filters="statusFilter"
-        :column-key="'proStatus'"
+        :column-key="'reviewResult'"
         :formatter="formatStatus"
       ></el-table-column>
       <el-table-column fixed="right" label="操作">
         <template slot-scope="scope">
-          <el-button
-            @click="dialogFormVisible=true,projectDetails=scope.row"
-            type="text"
-            size="small"
-          >查看详情</el-button>
+          <el-button @click="approve([scope.row])" type="text" size="small">审批</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -60,121 +64,15 @@
       layout="total, sizes, prev, pager, next, jumper"
       :total="projectTable.length"
     ></el-pagination>
-
-    <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
-      <el-form
-        label-position="left"
-        ref="projectDetails"
-        :model="projectDetails"
-        label-width="120px"
-        :disabled="true"
-      >
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目编号：" prop="id">
-              <el-input v-model="projectDetails.id" :disabled="true" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目名称：" prop="proName">
-              <el-input v-model="projectDetails.proName" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="项目类型：" prop="proType">
-              <el-input v-model="projectDetails.proType" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="学科分类：" prop="subject">
-              <el-input v-model="projectDetails.subject" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="项目经费：" prop="funds">
-              <el-input v-model="projectDetails.funds" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="研究年限：" prop="time">
-              <el-input v-model="projectDetails.time" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="10">
-            <el-form-item label="申报人：" prop="applicant.name">
-              <el-input v-model="projectDetails.applicant.name" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" :offset="2">
-            <el-form-item label="申报单位：" prop="applicant.repDept.deptName">
-              <el-input v-model="projectDetails.applicant.repDept.deptName" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="推荐单位：" prop="applicant.repDept.recDept.deptName">
-              <el-input v-model="projectDetails.applicant.repDept.recDept.deptName" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="关键词：" prop="keywords">
-              <el-input v-model="projectDetails.keywords" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目内容摘要" prop="desc">
-              <el-input v-model="projectDetails.desc" type="textarea" placeholder="300字以内" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="22">
-            <el-form-item label="项目文件" prop="desc">
-              <el-input v-model="projectDetails.desc" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <!-- <el-button type="primary" @click="pass([projectDetails])">通过</el-button> -->
-      </div>
-    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getProjectsByStatuss } from '@/api/applicant'
-import {
-  NOTPASS,
-  THREEREVIEW,
-  EXPERTASSIGN,
-  EXPERTREVIEW,
-  PASS,
-  PASSRPD
-} from '@/variables'
+import { getProjectsByStatuss, updateProjects } from '@/api/applicant'
+import { NOTPASS, PENDING, PASS, PASSRPD } from '@/variables'
 export default {
   data() {
-    const statusList = [NOTPASS, THREEREVIEW, EXPERTASSIGN, EXPERTREVIEW, PASS]
+    const statusList = [NOTPASS, PASS]
     const statusFilter = [
       { text: '未通过', value: 1 },
       { text: '打回修改', value: 2 },
@@ -197,26 +95,7 @@ export default {
       projectTable: [],
       firstData: [],
       listLoading: true,
-      dialogFormVisible: false,
-      projectDetails: {
-        id: '',
-        proName: '',
-        proType: '',
-        subject: '',
-        funds: 0,
-        time: 0,
-        keywords: '',
-        desc: '',
-        applicant: {
-          name: '',
-          repDept: {
-            deptName: '',
-            recDept: {
-              deptName: ''
-            }
-          }
-        }
-      },
+      multipleSelection: [],
       pageSize: 5,
       currentPage: 1,
       pageSizes: [5, 10, 15, 20]
@@ -233,10 +112,23 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { projects } = await getProjectsByStatuss(this.statusList)
+      const { projects } = await getProjectsByStatuss([PENDING])
       this.firstData = this.projectTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false
+    },
+    async approve(projects) {
+      for (let project of projects) {
+        project.proStatus = project.reviewResult
+      }
+      const { updatePros } = await updateProjects(projects)
+      if (updatePros.length != 0) {
+        this.$message({
+          type: 'success',
+          message: '审批该项目成功！'
+        })
+        this.fetchData()
+      }
     },
     setFilter(projects) {
       for (const project of projects) {
@@ -272,8 +164,17 @@ export default {
     },
     formatStatus(row, column) {
       return this.statusFilter.filter(status => {
-        return status.value == row.proStatus
+        return status.value == row.reviewResult
       })[0].text
+    },
+    handleSelectionChange(val) {
+      this.multipleSelection = val
+    },
+    multipleSelectionTip() {
+      this.$message({
+        message: '请选择项目',
+        type: 'warning'
+      })
     },
     handleSizeChange(val) {
       this.pageSize = val

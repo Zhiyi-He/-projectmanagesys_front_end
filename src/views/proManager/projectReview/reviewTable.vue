@@ -180,9 +180,7 @@
 </template>
 
 <script>
-import { getProjectsByStatus, updateProjects } from '@/api/applicant'
-import { getApplicants } from '@/api/repDept'
-import { getRecDepts, getRepDepts } from '@/api/recDept'
+import { getProjectsByStatuss, updateProjects } from '@/api/applicant'
 import {
   PASSRPD,
   NOTPASS,
@@ -236,25 +234,8 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      this.resetTableData()
-      const { recDepts } = await getRecDepts()
-      for (const recDept of recDepts) {
-        const { repDepts } = await getRepDepts(recDept.id)
-        for (const repDept of repDepts) {
-          if (repDept.rpdStatus == PASSRPD) {
-            const { applicants } = await getApplicants(repDept.id)
-            for (const applicant of applicants) {
-              const { projects } = await getProjectsByStatus({
-                applicant: applicant,
-                status: [THREEREVIEW]
-              })
-              this.firstData = this.reviewTable = this.reviewTable.concat(
-                projects
-              )
-            }
-          }
-        }
-      }
+      const { projects } = await getProjectsByStatuss([THREEREVIEW])
+      this.firstData = this.reviewTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false
     },
