@@ -186,14 +186,11 @@ export default {
     async fetchData() {
       this.listLoading = true
       const { userVo } = await getUserInfo()
-      const { applicants } = await getApplicants(userVo.id)
-      for (const applicant of applicants) {
-        const { projects } = await getProjectsByStatus({
-          applicant: applicant,
-          status: this.statusList
-        })
-        this.firstData = this.projectTable = this.projectTable.concat(projects)
-      }
+      let { projects } = await getProjectsByStatus([FIRSTREVIEW])
+      projects = projects.filter(project => {
+        return project.applicant.repDept.id == userVo.id
+      })
+      this.firstData = this.projectTable = this.projectTable.concat(projects)
       this.setFilter(this.firstData)
       this.listLoading = false
     },

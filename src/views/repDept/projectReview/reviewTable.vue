@@ -190,14 +190,11 @@ export default {
       this.listLoading = true
       this.resetTableData()
       const { userVo } = await getUserInfo()
-      const { applicants } = await getApplicants(userVo.id)
-      for (const applicant of applicants) {
-        const { projects } = await getProjectsByStatus({
-          applicant: applicant,
-          status: [FIRSTREVIEW]
-        })
-        this.firstData = this.reviewTable = this.reviewTable.concat(projects)
-      }
+      let { projects } = await getProjectsByStatus([FIRSTREVIEW])
+      projects = projects.filter(project => {
+        return project.applicant.repDept.id == userVo.id
+      })
+      this.firstData = this.reviewTable = this.reviewTable.concat(projects)
       this.setFilter(this.firstData)
       this.listLoading = false
     },

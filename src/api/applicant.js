@@ -70,16 +70,7 @@ export function updateProjects(projects) {
     return res;
 }
 
-export function getProjectsByStatus(data) {
-    const res = request({
-        url: 'applicant/projects',
-        method: 'post',
-        data: data
-    });
-    return res;
-}
-
-export function getProjectsByStatuss(statusList) {
+export function getProjectsByStatus(statusList) {
     const res = request({
         url: 'applicant/projects/' + statusList,
         method: 'get',

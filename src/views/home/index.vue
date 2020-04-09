@@ -14,23 +14,28 @@
     </el-header>
     <el-main>
       <div class="notice">
-        <el-tabs type="card" style="height:100%;width:100%;">
-          <el-tab-pane label="系统通知">
-            <div :key="item.id" v-for="item in sysNotices">
+        <el-tabs
+          v-model="activeName"
+          type="card"
+          style="height:100%;width:100%;"
+          @tab-click="handleClick"
+        >
+          <el-tab-pane label="系统通知" name="notice">
+            <div :key="item.id" v-for="item in files">
               <el-link
                 :underline="false"
-                :href="noticeUrl+item.title+'.doc'"
+                :href="noticeUrl+item.newFileName"
                 type="primary"
               >{{item.title}}</el-link>
               <span>{{item.date}}</span>
               <el-divider></el-divider>
             </div>
           </el-tab-pane>
-          <el-tab-pane label="系统使用手册">
-            <div :key="item.id" v-for="item in sysManual">
+          <el-tab-pane label="系统使用手册" name="manual">
+            <div :key="item.id" v-for="item in files">
               <el-link
                 :underline="false"
-                :href="manualUrl+item.title+'.docx'"
+                :href="manualUrl+item.newFileName"
                 type="primary"
               >{{item.title}}</el-link>
               <span>{{item.date}}</span>
@@ -78,25 +83,27 @@ import {
   NOTICEURL,
   MANUALURL
 } from '@/variables'
+import { getFilesByType } from '@/api/files'
 export default {
   data() {
     return {
-      sysNotices: [
-        { id: 1, title: '项目申请书下册内容填写模板', date: '2020-2-15' }
-      ],
-      sysManual: [
-        { id: 1, title: '申报单位使用说明', date: '2020-2-15' },
-        { id: 2, title: '项目管理员使用说明', date: '2020-2-15' },
-        { id: 3, title: '组织推荐单位使用说明', date: '2020-2-15' },
-        { id: 4, title: '组织单位兼申报单位使用说明', date: '2020-2-15' },
-        { id: 5, title: '系统管理员使用说明', date: '2020-2-15' }
-      ],
+      files: [],
       noticeUrl: NOTICEURL,
-      manualUrl: MANUALURL
+      manualUrl: MANUALURL,
+      activeName: 'notice'
     }
   },
 
   methods: {
+    async handleClick(tab, event) {
+      if (tab.name == 'notice') {
+        const { files } = await getFilesByType([0])
+        this.files = files
+      } else {
+        const { files } = await getFilesByType([1])
+        this.files = files
+      }
+    },
     backHome() {
       this.$router.push('/home')
     },
@@ -133,6 +140,10 @@ export default {
         }
       })
     }
+  },
+  async mounted() {
+    const { files } = await getFilesByType(0)
+    this.files = files
   }
 }
 </script>

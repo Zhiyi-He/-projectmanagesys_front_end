@@ -10,13 +10,13 @@
     <el-upload
       ref="upload"
       action="#"
+      multiple
       :http-request="uploadFile"
       :on-preview="handlePreview"
       :on-remove="handleRemove"
       :before-remove="beforeRemove"
       :file-list="fileList"
       :auto-upload="false"
-      multiple
     >
       <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
       <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload()">上传文件</el-button>
@@ -26,44 +26,44 @@
 </template>
 
 <script>
-import { filesUpload } from "@/api/files";
-import router from "@/router";
-import { BASEURL } from "@/variables";
+import { filesUpload } from '@/api/files'
+import router from '@/router'
+import { BASEURL } from '@/variables'
 export default {
   data() {
     return {
       active: 2,
       fileData: {},
       fileList: []
-    };
+    }
   },
   methods: {
     submitUpload() {
-      this.fileData = new FormData();
-      this.$refs.upload.submit();
+      this.fileData = new FormData()
+      this.$refs.upload.submit()
       filesUpload(this.fileData).then(response => {
-        this.fileList.push({ name: "开题答辩.ppt", url: "" });
+        this.fileList.push({ name: '开题答辩.ppt', url: '' })
         this.$message({
-          message: "文件上传成功！",
-          type: "success"
-        });
-      });
+          message: '文件上传成功！',
+          type: 'success'
+        })
+      })
     },
     uploadFile(item) {
-      this.fileData.append("file", item.file);
+      this.fileData.append('files', item.file)
     },
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      console.log(file, fileList)
     },
     handlePreview(file) {
-      console.log(file);
+      console.log(file)
     },
     beforeRemove(file, fileList) {
-      return this.$confirm(`确定移除 ${file.name}？`);
+      return this.$confirm(`确定移除 ${file.name}？`)
     }
   },
   created() {}
-};
+}
 </script>
 
 <style lang='scss' scoped>

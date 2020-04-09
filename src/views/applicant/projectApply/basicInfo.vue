@@ -91,9 +91,9 @@ export default {
   methods: {
     async onSubmit() {
       const { userVo } = await getUserInfo()
-      const { projects } = await getProjectsByStatus({
-        applicant: userVo,
-        status: [PROJECTUPDATE]
+      let { projects } = await getProjectsByStatus([PROJECTUPDATE])
+      projects = projects.filter(project => {
+        return project.applicant.id == userVo.id
       })
       if (projects.length != 0) {
         await deleteProject(projects[0].id)

@@ -277,6 +277,31 @@ const routes = [
     ]
   },
 
+  //系统管理员路由
+  {
+    path: '/sysInfo',
+    component: Layout,
+    redirect: '/sysInfo/releaseInfo',
+    name: 'sysInfo',
+    meta: { title: '信息管理', icon: 'example', subsystem: SYSMANAGER },
+    children: [
+      {
+        path: 'releaseInfo',
+        name: 'releaseInfo',
+        component: () => import('@/views/sysManager/info/releaseInfo'),
+        meta: { title: '信息发布', icon: 'form', subsystem: SYSMANAGER }
+      },
+      {
+        path: 'sysInfoTable',
+        name: 'sysInfoTable',
+        component: () => import('@/views/sysManager/info/sysInfoTable'),
+        meta: { title: '已发布信息', icon: 'table', subsystem: SYSMANAGER }
+      },
+    ]
+  },
+
+
+
   //评审专家路由
   {
     path: '/expertInfo',
@@ -315,6 +340,8 @@ const routes = [
       },
     ]
   },
+
+
 
   // {
   //   path: '/external-link',

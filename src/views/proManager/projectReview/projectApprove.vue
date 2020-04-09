@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { getProjectsByStatuss, updateProjects } from '@/api/applicant'
+import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { NOTPASS, PENDING, PASS, PASSRPD } from '@/variables'
 export default {
   data() {
@@ -112,7 +112,7 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { projects } = await getProjectsByStatuss([PENDING])
+      const { projects } = await getProjectsByStatus([PENDING])
       this.firstData = this.projectTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false

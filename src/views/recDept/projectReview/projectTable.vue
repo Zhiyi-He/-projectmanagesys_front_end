@@ -213,21 +213,26 @@ export default {
     async fetchData() {
       this.listLoading = true
       const { userVo } = await getUserInfo()
-      const { repDepts } = await getRepDepts(userVo.id)
-      for (const repDept of repDepts) {
-        if (repDept.rpdStatus == PASSRPD) {
-          const { applicants } = await getApplicants(repDept.id)
-          for (const applicant of applicants) {
-            const { projects } = await getProjectsByStatus({
-              applicant: applicant,
-              status: this.statusList
-            })
-            this.firstData = this.projectTable = this.projectTable.concat(
-              projects
-            )
-          }
-        }
-      }
+      let { projects } = await getProjectsByStatus(this.statusList)
+      projects = projects.filter(project => {
+        return project.applicant.repDept.recDept.id == userVo.id
+      })
+      this.firstData = this.projectTable = this.projectTable.concat(projects)
+      // const { repDepts } = await getRepDepts(userVo.id)
+      // for (const repDept of repDepts) {
+      //   if (repDept.rpdStatus == PASSRPD) {
+      //     const { applicants } = await getApplicants(repDept.id)
+      //     for (const applicant of applicants) {
+      //       const { projects } = await getProjectsByStatus({
+      //         applicant: applicant,
+      //         status: this.statusList
+      //       })
+      //       this.firstData = this.projectTable = this.projectTable.concat(
+      //         projects
+      //       )
+      //     }
+      //   }
+      // }
       this.setFilter(this.firstData)
       this.listLoading = false
     },

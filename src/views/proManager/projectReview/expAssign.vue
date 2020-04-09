@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { getProjectsByStatuss, updateProjects } from '@/api/applicant'
+import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { PASSRPD, EXPERTASSIGN, EXPERTREVIEW } from '@/variables'
 export default {
   data() {
@@ -88,7 +88,7 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { projects } = await getProjectsByStatuss([EXPERTASSIGN])
+      const { projects } = await getProjectsByStatus([EXPERTASSIGN])
       this.firstData = this.assignTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false

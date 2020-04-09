@@ -177,9 +177,6 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-// import { getProjectsByStatus, updateProjects } from '@/api/applicant'
-// import { getApplicants } from '@/api/repDept'
-// import { getRepDepts, getRecDepts } from '@/api/recDept'
 import { getExpert } from '@/api/expert'
 import { updateScore } from '@/api/score'
 import { PASSRPD, EXPERTREVIEW } from '@/variables'

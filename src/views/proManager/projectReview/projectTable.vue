@@ -163,7 +163,7 @@
 </template>
 
 <script>
-import { getProjectsByStatuss } from '@/api/applicant'
+import { getProjectsByStatus } from '@/api/applicant'
 import {
   NOTPASS,
   THREEREVIEW,
@@ -233,7 +233,7 @@ export default {
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { projects } = await getProjectsByStatuss(this.statusList)
+      const { projects } = await getProjectsByStatus(this.statusList)
       this.firstData = this.projectTable = projects
       this.setFilter(this.firstData)
       this.listLoading = false
