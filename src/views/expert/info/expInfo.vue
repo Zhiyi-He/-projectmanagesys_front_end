@@ -107,7 +107,7 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getExpert, updateExpert } from '@/api/expert'
+import { getExpert, updateExperts } from '@/api/expert'
 import router from '@/router'
 export default {
   data() {
@@ -131,8 +131,8 @@ export default {
   },
   methods: {
     async onSubmit(expInfo) {
-      const { updateUser } = await updateExpert(expInfo)
-      if (updateUser != null) {
+      const { updateResult } = await updateExperts([expInfo])
+      if (updateResult != null) {
         this.$message({
           message: '修改用户信息成功！',
           type: 'success'

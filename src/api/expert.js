@@ -27,11 +27,12 @@ export function deleteExperts(experts) {
     return res;
 }
 
-export function updateExpert(expert) {
+
+export function updateExperts(experts) {
     const res = request({
         url: 'expert/expert',
         method: 'put',
-        data: expert
+        data: experts
     });
     return res;
 }

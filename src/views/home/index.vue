@@ -24,7 +24,8 @@
             <div :key="item.id" v-for="item in files">
               <el-link
                 :underline="false"
-                :href="noticeUrl+item.newFileName"
+                href="javascript:;"
+                @click.native="downloadFile(item.path)"
                 type="primary"
               >{{item.title}}</el-link>
               <span>{{item.date}}</span>
@@ -35,7 +36,8 @@
             <div :key="item.id" v-for="item in files">
               <el-link
                 :underline="false"
-                :href="manualUrl+item.newFileName"
+                href="javascript:;"
+                @click.native="downloadFile(item.path)"
                 type="primary"
               >{{item.title}}</el-link>
               <span>{{item.date}}</span>
@@ -80,16 +82,14 @@ import {
   PROMANAGER,
   SYSMANAGER,
   EXPERT,
-  NOTICEURL,
-  MANUALURL
+  DOWNLOADURL
 } from '@/variables'
-import { getFilesByType } from '@/api/files'
+import { getFilesByType, downloadFiles } from '@/api/files'
 export default {
   data() {
     return {
       files: [],
-      noticeUrl: NOTICEURL,
-      manualUrl: MANUALURL,
+      downloadUrl: DOWNLOADURL,
       activeName: 'notice'
     }
   },
@@ -103,6 +103,9 @@ export default {
         const { files } = await getFilesByType([1])
         this.files = files
       }
+    },
+    downloadFile(path) {
+      window.location.href = DOWNLOADURL + path
     },
     backHome() {
       this.$router.push('/home')

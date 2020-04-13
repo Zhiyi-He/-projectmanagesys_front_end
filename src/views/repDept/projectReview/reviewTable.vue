@@ -126,15 +126,22 @@
 
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目内容摘要" prop="desc">
+            <el-form-item label="项目内容摘要:" prop="desc">
               <el-input v-model="projectDetails.desc" type="textarea" placeholder="300字以内" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="22">
-            <el-form-item label="项目文件" prop="desc">
-              <el-input v-model="projectDetails.desc" />
+            <el-form-item label="项目文件:" prop="files">
+              <div class="link" :key="item.id" v-for="item in projectDetails.files">
+                <el-link
+                  :underline="false"
+                  href="javascript:;"
+                  @click.native="downloadFile(item.path)"
+                  type="primary"
+                >{{item.title}}</el-link>
+              </div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -152,7 +159,13 @@
 import { getApplicants } from '@/api/repDept'
 import { getProjectsByStatus, updateProjects } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
-import { FIRSTREVIEW, NOTPASS, BACKMODIFY, SECONDREVIEW } from '@/variables'
+import {
+  FIRSTREVIEW,
+  NOTPASS,
+  BACKMODIFY,
+  SECONDREVIEW,
+  DOWNLOADURL
+} from '@/variables'
 export default {
   data() {
     return {
@@ -170,7 +183,8 @@ export default {
         funds: 0,
         time: 0,
         keywords: '',
-        desc: ''
+        desc: '',
+        files: []
       },
       pageSize: 5,
       currentPage: 1,
@@ -240,6 +254,9 @@ export default {
       })
       this.review(projects, '是否要通过该项目', '通过该项目成功！')
     },
+    downloadFile(path) {
+      window.location.href = DOWNLOADURL + path
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val
     },
@@ -308,3 +325,8 @@ export default {
   }
 }
 </script>
+<style lang='scss' scoped>
+.link {
+  line-height: 25px;
+}
+</style> 

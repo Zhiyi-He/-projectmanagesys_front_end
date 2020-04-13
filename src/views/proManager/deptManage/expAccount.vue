@@ -73,7 +73,7 @@
 import {
   getExperts,
   addExpert,
-  updateExpert,
+  updateExperts,
   deleteExperts
 } from '@/api/expert'
 export default {
@@ -121,8 +121,8 @@ export default {
       }
     },
     async editRow(expert) {
-      const { updateUser } = await updateExpert(expert)
-      if (updateUser != null) {
+      const { updateResult } = await updateExperts([expert])
+      if (updateResult != null) {
         this.$message({
           message: '修改评审专家成功！',
           type: 'success'

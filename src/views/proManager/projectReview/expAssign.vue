@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-button
-      @click="multipleSelection.length==0?multipleSelectionTip():pass(multipleSelection)"
+      @click="multipleSelection.length==0?multipleSelectionTip():assignExpert(multipleSelection)"
       icon="el-icon-check"
       type="primary"
       plain
@@ -42,7 +42,7 @@
       ></el-table-column>
       <el-table-column fixed="right" label="操作" width="220px">
         <template slot-scope="scope">
-          <el-button @click="pass([scope.row])" type="text" size="small">分配</el-button>
+          <el-button @click="assignExpert([scope.row])" type="text" size="small">分配</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +61,10 @@
 
 <script>
 import { getProjectsByStatus, updateProjects } from '@/api/applicant'
+import { getExperts, updateExperts } from '@/api/expert'
+import { addScore } from '@/api/score'
 import { PASSRPD, EXPERTASSIGN, EXPERTREVIEW } from '@/variables'
+import { shuffle } from '@/utils/random-data'
 export default {
   data() {
     return {
@@ -100,6 +103,20 @@ export default {
         type: 'warning'
       })
         .then(async () => {
+          for (const project of projects) {
+            let { experts } = await getExperts()
+            experts = shuffle(
+              experts.filter(expert => {
+                return expert.proNum < 5
+              })
+            ).slice(0, 3)
+            project.proStatus = EXPERTREVIEW
+            for (const expert of experts) {
+              expert.proNum += 1
+              const { addResult } = await addScore(project, expert)
+            }
+            await updateExperts(experts)
+          }
           const { updatePros } = await updateProjects(projects)
           if (updatePros.length != 0) {
             this.$message({
@@ -116,10 +133,7 @@ export default {
           })
         })
     },
-    pass(projects) {
-      projects.forEach(project => {
-        project.proStatus = EXPERTREVIEW
-      })
+    async assignExpert(projects) {
       this.review(projects, '是否要分配专家到该项目', '分配专家成功！')
     },
     handleSelectionChange(val) {

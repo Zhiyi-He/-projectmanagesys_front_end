@@ -1,5 +1,14 @@
 import request from '@/utils/request'
 
+export function downloadFiles(files) {
+    const res = request({
+        url: 'files/download',
+        method: 'post',
+        data: files
+    });
+    return res;
+}
+
 export function filesUpload(fileData) {
     const res = request({
         url: 'files/upload',

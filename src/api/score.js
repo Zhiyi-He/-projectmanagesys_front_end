@@ -1,6 +1,18 @@
 
 import request from '@/utils/request'
 
+export function addScore(project, expert) {
+    const res = request({
+        url: 'score/score',
+        method: 'post',
+        data: {
+            project: project,
+            expert: expert,
+        }
+    });
+    return res;
+}
+
 export function updateScore(projectExpert) {
     const res = request({
         url: 'score/score',
@@ -12,7 +24,7 @@ export function updateScore(projectExpert) {
 
 export function getScoresByProject(project) {
     const res = request({
-        url: 'score/score',
+        url: 'score/scores',
         method: 'post',
         data: project
     });

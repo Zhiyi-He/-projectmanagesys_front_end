@@ -35,7 +35,12 @@
               ref="upload"
               :multiple="false"
               :limit="1"
+              :on-remove="handleRemove"
+              :on-change="handleChange"
+              :on-success="handleSuccess"
+              :on-error="handleError"
               :on-exceed="handleExceed"
+              :before-remove="beforeRemove"
               :http-request="httpRequest"
               action="https://jsonplaceholder.typicode.com/posts/"
               :file-list="fileList"
@@ -100,21 +105,38 @@ export default {
       })
     },
     async httpRequest(param) {
-      let fileObj = param.file // 相当于input里取得的files
       let fd = new FormData() // FormData 对象
-      fd.append('files', fileObj) // 文件对象
+      fd.append('files', param.file) // 文件对象
       fd.append('fileType', this.releaseInfo.fileType)
       fd.append('title', this.releaseInfo.title)
       const { files } = await filesUpload(fd)
       this.resetForm('releaseInfo')
-      this.fileList = []
-      this.$message({
-        message: '文件上传成功！',
-        type: 'success'
-      })
+      param.onSuccess('文件上传成功')
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+    },
+    handleRemove(file, fileList) {
+      this.fileList = fileList
+    },
+    beforeRemove(file, fileList) {
+      return this.$confirm(`确定移除 ${file.name}？`)
+    },
+    handleChange(file, fileList) {
+      this.fileList = fileList
+    },
+    handleSuccess(response, file, fileList) {
+      this.fileList = fileList
+      this.$message({
+        message: response,
+        type: 'success'
+      })
+    },
+    handleError(err, file, fileList) {
+      this.$message({
+        message: '文件上传失败！',
+        type: 'error'
+      })
     },
     handleExceed(files, fileList) {
       this.$message.warning(

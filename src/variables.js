@@ -10,8 +10,7 @@ module.exports = {
     // DOUBLEDEPT: 'doubleDept',
 
     //URL常量
-    NOTICEURL: 'http://localhost:8080/files/download/?parentPath=notice&filename=',
-    MANUALURL: 'http://localhost:8080/files/download/?parentPath=manual&filename=',
+    DOWNLOADURL: 'http://localhost:8080/files/download?path=',
     BASEURL: 'http://localhost:8080/',
 
     //项目状态常量
