@@ -77,10 +77,10 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getProjectsByStatus } from '@/api/applicant'
+import { getProjects } from '@/api/applicant'
 import { filesUpload, deleteFiles } from '@/api/files'
 import router from '@/router'
-import { PROJECTUPDATE, DOWNLOADURL } from '@/variables'
+import { PROJECTUPDATE, DOWNLOADURL, APPLICANT } from '@/variables'
 export default {
   data() {
     return {
@@ -107,10 +107,12 @@ export default {
     async fetchData() {
       this.listLoading = true
       const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus([PROJECTUPDATE])
-      this.project = projects.filter(project => {
-        return project.applicant.id == userVo.id
-      })[0]
+      const { projects } = await getProjects({
+        userType: APPLICANT,
+        userId: userVo.id,
+        statusStr: [PROJECTUPDATE].join(',')
+      })
+      this.project = projects[0]
       this.fileTable = this.project.files
       this.listLoading = false
     },

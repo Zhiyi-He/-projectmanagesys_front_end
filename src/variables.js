@@ -13,6 +13,26 @@ module.exports = {
     DOWNLOADURL: 'http://localhost:8080/files/download?path=',
     BASEURL: 'http://localhost:8080/',
 
+    //项目类型
+    PROTYPES: [
+        { text: '青年人才', value: '青年人才' },
+        { text: '面上项目', value: '面上项目' },
+        { text: '指导性项目（资助）', value: '指导性项目（资助）' },
+        { text: '指导性项目（非资助）', value: '指导性项目（非资助）' }
+    ],
+    //学科分类
+    SUBJECTS: [
+        { text: '基础医学', value: '基础医学' },
+        { text: '临床医学', value: '临床医学' },
+        { text: '公共卫生与预防医学', value: '公共卫生与预防医学' },
+        { text: '中医学', value: '中医学' },
+        { text: '中西医结合', value: '中西医结合' },
+        { text: '药学', value: '药学' },
+        { text: '护理学', value: '护理学' }
+    ],
+    //项目经费
+    FUNDS: [10000, 20000, 50000, 100000],
+
     //项目状态常量
     PROJECTUPDATE: 0,        //项目更新--创建项目或者修改项目时，状态唯一
     NOTPASS: 1,              //项目未通过
@@ -29,4 +49,5 @@ module.exports = {
     NOTPASSRPD: 0,          //审核未通过
     UNDEREVIEW: 1,           //申报单位待审核
     PASSRPD: 2,            //审核通过
+
 }

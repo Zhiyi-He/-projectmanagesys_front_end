@@ -144,13 +144,9 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import {
-  getProjectsByStatus,
-  updateProjects,
-  getAppInfo
-} from '@/api/applicant'
+import { getProjects, updateProjects, getAppInfo } from '@/api/applicant'
 import router from '@/router'
-import { PROJECTUPDATE } from '@/variables'
+import { PROJECTUPDATE, APPLICANT } from '@/variables'
 export default {
   data() {
     const options = [10000, 20000, 50000, 100000]
@@ -203,9 +199,10 @@ export default {
     },
     async fetchData() {
       const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus([PROJECTUPDATE])
-      projects = projects.filter(project => {
-        return project.applicant.id == userVo.id
+      const { projects } = await getProjects({
+        userType: APPLICANT,
+        userId: userVo.id,
+        statusStr: [PROJECTUPDATE].join(',')
       })
       if (projects.length != 0) {
         this.projectContent = projects[0]

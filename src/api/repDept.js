@@ -51,3 +51,11 @@ export function getRepDeptsByRpdStatus(status) {
     });
     return res;
 }
+export function getRpdNames(rcdNames) {
+    const res = request({
+        url: 'repDept/rpdNames',
+        method: 'post',
+        data: rcdNames
+    });
+    return res;
+}

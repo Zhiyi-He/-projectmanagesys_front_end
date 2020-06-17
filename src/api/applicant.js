@@ -36,10 +36,11 @@ export function addApplicant(applicant) {
     return res;
 }
 
-export function getProList(id) {
+export function getAppNames(rpdNames) {
     const res = request({
-        url: 'applicant/proList/' + id,
-        method: 'get',
+        url: 'applicant/appNames',
+        method: 'post',
+        data: rpdNames
     });
     return res;
 }
@@ -70,10 +71,25 @@ export function updateProjects(projects) {
     return res;
 }
 
-export function getProjectsByStatus(statusList) {
+
+export function getProjects(data) {
     const res = request({
-        url: 'applicant/projects/' + statusList,
+        url: 'applicant/projects',
         method: 'get',
+        params: {
+            userType: data.userType,
+            userId: data.userId,
+            statusStr: data.statusStr,
+            proName: data.proName,
+            isScore: data.isScore,
+            pageSize: data.pageSize,
+            pageNum: data.pageNum,
+            proTypesStr: data.proTypesStr,
+            subjectsStr: data.subjectsStr,
+            appNamesStr: data.appNamesStr,
+            rpdNamesStr: data.rpdNamesStr,
+            rcdNamesStr: data.rcdNamesStr
+        }
     });
     return res;
 }

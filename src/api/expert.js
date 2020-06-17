@@ -38,10 +38,13 @@ export function updateExperts(experts) {
 }
 
 
-export function getExperts() {
+export function getExperts(expertNum) {
     const res = request({
         url: 'expert/experts',
         method: 'get',
+        params: {
+            expertNum
+        }
     });
     return res;
 }

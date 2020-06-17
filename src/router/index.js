@@ -166,6 +166,12 @@ const routes = [
         component: () => import('@/views/repDept/projectReview/projectTable'),
         meta: { title: '项目列表', icon: 'table', subsystem: REPDEPT }
       },
+      // {
+      //   path: 'testTable',
+      //   name: 'testTable',
+      //   component: () => import('@/views/testTable'),
+      //   meta: { title: '项目列表', icon: 'table', subsystem: REPDEPT }
+      // },
     ]
   },
 

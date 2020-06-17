@@ -1,8 +1,45 @@
 <template>
   <div class="app-container">
+    <div class="search">
+      <el-input v-model="query.proName" size="small" placeholder="请输入项目名称" />
+      <el-select
+        v-model="rcdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择推荐单位"
+        @visible-change="selectDisabled1?null:getRcdNamesFilter"
+        :disabled="selectDisabled1"
+      >
+        <el-option v-for="item in rcdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="rpdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报单位"
+        @visible-change="selectDisabled2?null:getRpdNamesFilter"
+        :disabled="selectDisabled2"
+      >
+        <el-option v-for="item in rpdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="appNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报人"
+        @visible-change="getAppNamesFilter"
+      >
+        <el-option v-for="item in appNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-button @click="queryData()" icon="el-icon-search" type="primary" size="small" plain>查询</el-button>
+    </div>
+    <!-- :data="projectTable.slice((pageNum-1)*pageSize,pageNum*pageSize)" -->
     <el-table
       v-loading="listLoading"
-      :data="projectTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="projectTable"
       element-loading-text="Loading"
       border
       fit
@@ -11,17 +48,10 @@
     >
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
-      <el-table-column prop="proType" label="项目类型"></el-table-column>
+      <el-table-column prop="proType" label="项目类型" :filters="proTypeFilter" :column-key="'proType'"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
-      <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column prop="funds" width="150px" label="项目经费（元）" sortable></el-table-column>
-      <el-table-column prop="time" width="150px" label="研究年限（年）" sortable></el-table-column>
-      <el-table-column
-        prop="applicant.name"
-        label="申报人"
-        :filters="appNameFilter"
-        :column-key="'appName'"
-      ></el-table-column>
+      <el-table-column prop="subject" label="学科分类" :filters="subjectFilter" :column-key="'subject'"></el-table-column>
+      <el-table-column prop="applicant.name" label="申报人"></el-table-column>
       <el-table-column
         prop="proStatus"
         label="申报状态"
@@ -43,11 +73,11 @@
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page="query.pageNum"
       :page-sizes="pageSizes"
-      :page-size="pageSize"
+      :page-size="query.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="projectTable.length"
+      :total="total"
     ></el-pagination>
 
     <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
@@ -99,7 +129,26 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-row>
+          <el-col :span="10">
+            <el-form-item label="申报人：" prop="applicant.name">
+              <el-input v-model="projectDetails.applicant.name" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="10" :offset="2">
+            <el-form-item label="申报单位：" prop="applicant.repDept.deptName">
+              <el-input v-model="projectDetails.applicant.repDept.deptName" />
+            </el-form-item>
+          </el-col>
+        </el-row>
 
+        <el-row>
+          <el-col :span="22">
+            <el-form-item label="推荐单位：" prop="applicant.repDept.recDept.deptName">
+              <el-input v-model="projectDetails.applicant.repDept.recDept.deptName" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row>
           <el-col :span="22">
             <el-form-item label="关键词：" prop="keywords">
@@ -139,14 +188,17 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getProjectsByStatus } from '@/api/applicant'
-import { getApplicants } from '@/api/repDept'
+import { getProjects, getAppNames } from '@/api/applicant'
+import { getApplicants, getRpdNames, getRpdInfo } from '@/api/repDept'
 import {
   NOTPASS,
   FIRSTREVIEW,
   SECONDREVIEW,
   PASS,
-  DOWNLOADURL
+  DOWNLOADURL,
+  REPDEPT,
+  PROTYPES,
+  SUBJECTS
 } from '@/variables'
 export default {
   data() {
@@ -167,9 +219,17 @@ export default {
     return {
       statusList: statusList,
       statusFilter: statusFilter,
+      proTypeFilter: PROTYPES,
+      subjectFilter: SUBJECTS,
       appNameFilter: [],
+      rpdNameFilter: [],
+      rcdNameFilter: [],
+      appNames: [],
+      rpdNames: [],
+      rcdNames: [],
+      selectDisabled1: false,
+      selectDisabled2: false,
       projectTable: [],
-      firstData: [],
       listLoading: true,
       dialogFormVisible: false,
       projectDetails: {
@@ -181,100 +241,106 @@ export default {
         time: 0,
         keywords: '',
         desc: '',
-        files: []
+        files: [],
+        applicant: {
+          name: '',
+          repDept: {
+            deptName: '',
+            recDept: {
+              deptName: ''
+            }
+          }
+        }
       },
-      pageSize: 5,
-      currentPage: 1,
-      pageSizes: [5, 10, 15, 20]
+      pageSizes: [5, 10, 15, 20],
+      total: 0,
+      query: {
+        userType: '',
+        userId: '',
+        statusStr: statusList.join(','),
+        pageSize: 5,
+        pageNum: 1,
+        proName: '',
+        proTypesStr: '',
+        subjectsStr: '',
+        appNamesStr: ''
+      }
     }
   },
   created() {
-    this.fetchData()
+    this.setQuery()
   },
   computed: {
     indexComputed() {
-      return (this.currentPage - 1) * this.pageSize + 1
+      return (this.query.pageNum - 1) * this.query.pageSize + 1
+    }
+  },
+  watch: {
+    query: {
+      deep: true,
+      handler: function(newVal, oldVal) {
+        this.fetchData()
+      }
     }
   },
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus([FIRSTREVIEW])
-      projects = projects.filter(project => {
-        return project.applicant.repDept.id == userVo.id
-      })
-      this.firstData = this.projectTable = this.projectTable.concat(projects)
-      this.setFilter(this.firstData)
+      const { projects, total } = await getProjects(this.query)
+      this.projectTable = projects
+      this.total = total
+      // this.setFilter(this.projectTable)
       this.listLoading = false
+    },
+    queryData() {
+      this.query.rcdNamesStr = this.rcdNames.join(',')
+      this.query.rpdNamesStr = this.rpdNames.join(',')
+      this.query.appNamesStr = this.appNames.join(',')
+      this.query.pageNum = 1
     },
     downloadFile(path) {
       window.location.href = DOWNLOADURL + path
     },
-    setFilter(projects) {
-      for (const project of projects) {
-        if (
-          this.appNameFilter &&
-          !this.appNameFilter.some(item => item.value == project.applicant.name)
-        ) {
-          this.appNameFilter.push({
-            text: project.applicant.name,
-            value: project.applicant.name
-          })
-        }
-        if (
-          this.rpdNameFilter &&
-          !this.rpdNameFilter.some(
-            item => item.value == project.applicant.repDept.deptName
-          )
-        ) {
-          this.rpdNameFilter.push({
-            text: project.applicant.repDept.deptName,
-            value: project.applicant.repDept.deptName
-          })
-        }
-        if (
-          this.rcdNameFilter &&
-          !this.rcdNameFilter.some(
-            item => item.value == project.applicant.repDept.recDept.deptName
-          )
-        ) {
-          this.rcdNameFilter.push({
-            text: project.applicant.repDept.recDept.deptName,
-            value: project.applicant.repDept.recDept.deptName
-          })
-        }
-      }
+    async getAppNamesFilter() {
+      const { appNames } = await getAppNames(this.rpdNames)
+      this.appNameFilter = appNames
+    },
+    async setQuery() {
+      const { userVo } = await getUserInfo()
+      this.query.userType = REPDEPT
+      this.query.userId = userVo.id
+      const { userInfo } = await getRpdInfo(userVo.id)
+      this.rpdNameFilter = this.rpdNames = [userInfo.deptName]
+      this.rcdNameFilter = this.rcdNames = [userInfo.recDept.deptName]
+      this.selectDisabled1 = this.selectDisabled2 = true
     },
     formatStatus(row, column) {
       return this.statusFilter.filter(status => {
         return status.value == row.proStatus
       })[0].text
     },
-    filterAppName(value, row) {
-      return row.applicant.name == value
-    },
     handleSizeChange(val) {
-      this.pageSize = val
-      this.currentPage = 1
+      this.query.pageSize = val
+      this.query.pageNum = 1
     },
     handleCurrentChange(val) {
-      this.currentPage = val
+      this.query.pageNum = val
     },
     filterProjectTable(filters) {
-      this.projectTable = this.firstData
-
-      if (filters.appName && filters.appName.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return filters.appName.indexOf(project.applicant.name) != -1
-        })
+      if (filters.proType) {
+        this.query.proTypesStr = filters.proType.join(',')
       }
-      if (filters.proStatus && filters.proStatus.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return filters.proStatus.indexOf(project.proStatus) != -1
-        })
+      if (filters.subject) {
+        this.query.subjectsStr = filters.subject.join(',')
       }
-      this.currentPage = 1
+      if (filters.proStatus) {
+        if (filters.proStatus.length != 0) {
+          this.query.statusStr = filters.proStatus.join(',')
+        } else {
+          this.query.statusStr = this.statusList.join(',')
+        }
+      }
+      this.query.pageNum = 1
     }
   }
 }
@@ -282,5 +348,19 @@ export default {
 <style lang='scss' scoped>
 .link {
   line-height: 25px;
+}
+span {
+  margin-right: 10px;
+}
+.search {
+  margin-bottom: 5px;
+  .el-input {
+    width: 150px;
+    margin-right: 10px;
+  }
+  .el-select {
+    width: 180px;
+    margin-right: 6px;
+  }
 }
 </style> 

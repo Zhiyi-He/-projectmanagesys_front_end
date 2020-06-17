@@ -26,12 +26,34 @@
       <el-row>
         <el-col :span="10">
           <el-form-item label="项目类型：" prop="proType">
-            <el-input v-model="projectInfo.proType" />
+            <el-select
+              v-model="projectInfo.proType"
+              placeholder="请选择项目类型"
+              :popper-append-to-body="false"
+            >
+              <el-option
+                v-for="(item) in proTypes"
+                :key="item.value"
+                :label="item.text"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="10" :offset="2">
           <el-form-item label="学科分类：" prop="subject">
-            <el-input v-model="projectInfo.subject" />
+            <el-select
+              v-model="projectInfo.subject"
+              placeholder="请选择学科分类"
+              :popper-append-to-body="false"
+            >
+              <el-option
+                v-for="(item) in subjects"
+                :key="item.value"
+                :label="item.text"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
@@ -44,7 +66,7 @@
               placeholder="请选择预计申报经费"
               :popper-append-to-body="false"
             >
-              <el-option v-for="(item) in options" :key="item" :label="item" :value="item"></el-option>
+              <el-option v-for="(item) in fundss" :key="item" :label="item" :value="item"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
@@ -80,19 +102,23 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import {
-  getProjectsByStatus,
-  updateProjects,
-  getAppInfo
-} from '@/api/applicant'
+import { getProjects, updateProjects, getAppInfo } from '@/api/applicant'
 import router from '@/router'
-import { PROJECTUPDATE, FIRSTREVIEW } from '@/variables'
+import {
+  PROJECTUPDATE,
+  FIRSTREVIEW,
+  APPLICANT,
+  PROTYPES,
+  SUBJECTS,
+  FUNDS
+} from '@/variables'
 export default {
   data() {
-    const options = [10000, 20000, 50000, 100000]
     return {
-      options: options,
+      fundss: FUNDS,
       active: 3,
+      proTypes: PROTYPES,
+      subjects: SUBJECTS,
       projectInfo: {
         id: 0,
         proName: '',
@@ -118,9 +144,10 @@ export default {
     },
     async fetchData() {
       const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus([PROJECTUPDATE])
-      projects = projects.filter(project => {
-        return project.applicant.id == userVo.id
+      const { projects } = await getProjects({
+        userType: APPLICANT,
+        userId: userVo.id,
+        statusStr: [PROJECTUPDATE].join(',')
       })
       if (projects.length != 0) {
         this.projectInfo = projects[0]

@@ -17,7 +17,18 @@
       <el-row>
         <el-col :span="15">
           <el-form-item label="项目类型：" prop="proType">
-            <el-input v-model="basicInfo.proType" />
+            <el-select
+              v-model="basicInfo.proType"
+              placeholder="请选择项目类型"
+              :popper-append-to-body="false"
+            >
+              <el-option
+                v-for="(item) in proTypes"
+                :key="item.value"
+                :label="item.text"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
@@ -25,7 +36,18 @@
       <el-row>
         <el-col :span="15">
           <el-form-item label="学科分类：" prop="subject">
-            <el-input v-model="basicInfo.subject" />
+            <el-select
+              v-model="basicInfo.subject"
+              placeholder="请选择学科分类"
+              :popper-append-to-body="false"
+            >
+              <el-option
+                v-for="(item) in subjects"
+                :key="item.value"
+                :label="item.text"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>
@@ -66,16 +88,18 @@
 import {
   addProject,
   getAppInfo,
-  getProjectsByStatus,
+  getProjects,
   deleteProject
 } from '@/api/applicant'
 import { getUserInfo } from '@/api/user'
 import router from '@/router'
-import { PROJECTUPDATE } from '@/variables'
+import { PROJECTUPDATE, APPLICANT, PROTYPES, SUBJECTS } from '@/variables'
 export default {
   data() {
     return {
       active: 0,
+      proTypes: PROTYPES,
+      subjects: SUBJECTS,
       basicInfo: {
         proName: '',
         proType: '',
@@ -91,9 +115,10 @@ export default {
   methods: {
     async onSubmit() {
       const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus([PROJECTUPDATE])
-      projects = projects.filter(project => {
-        return project.applicant.id == userVo.id
+      const { projects } = await getProjects({
+        userType: APPLICANT,
+        userId: userVo.id,
+        statusStr: [PROJECTUPDATE].join(',')
       })
       if (projects.length != 0) {
         await deleteProject(projects[0].id)

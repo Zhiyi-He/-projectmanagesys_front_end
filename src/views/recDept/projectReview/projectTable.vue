@@ -1,8 +1,44 @@
 <template>
   <div class="app-container">
+    <div class="search">
+      <el-input v-model="query.proName" size="small" placeholder="请输入项目名称" />
+      <el-select
+        v-model="rcdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择推荐单位"
+        @visible-change="selectDisabled1?null:getRcdNamesFilter()"
+        :disabled="selectDisabled1"
+      >
+        <el-option v-for="item in rcdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="rpdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报单位"
+        @visible-change="selectDisabled2?null:getRpdNamesFilter()"
+        :disabled="selectDisabled2"
+      >
+        <el-option v-for="item in rpdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="appNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报人"
+        @visible-change="getAppNamesFilter"
+      >
+        <el-option v-for="item in appNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-button @click="queryData()" icon="el-icon-search" type="primary" size="small" plain>查询</el-button>
+    </div>
     <el-table
       v-loading="listLoading"
-      :data="projectTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="projectTable"
       element-loading-text="Loading"
       border
       fit
@@ -11,23 +47,11 @@
     >
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
-      <el-table-column prop="proType" label="项目类型"></el-table-column>
+      <el-table-column prop="proType" label="项目类型" :filters="proTypeFilter" :column-key="'proType'"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
-      <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column prop="funds" label="项目经费（元）" sortable></el-table-column>
-      <el-table-column prop="time" label="研究年限（年）" sortable></el-table-column>
-      <el-table-column
-        prop="applicant.name"
-        label="申报人"
-        :filters="appNameFilter"
-        :column-key="'appName'"
-      ></el-table-column>
-      <el-table-column
-        prop="applicant.repDept.deptName"
-        label="申报单位"
-        :filters="rpdNameFilter"
-        :column-key="'rpdName'"
-      ></el-table-column>
+      <el-table-column prop="subject" label="学科分类" :filters="subjectFilter" :column-key="'subject'"></el-table-column>
+      <el-table-column prop="applicant.name" label="申报人"></el-table-column>
+      <el-table-column prop="applicant.repDept.deptName" label="申报单位"></el-table-column>
       <el-table-column
         prop="proStatus"
         label="申报状态"
@@ -49,11 +73,11 @@
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page="query.pageNum"
       :page-sizes="pageSizes"
-      :page-size="pageSize"
+      :page-size="query.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="projectTable.length"
+      :total="total"
     ></el-pagination>
 
     <el-dialog title="项目详情" :visible.sync="dialogFormVisible" top="10px">
@@ -158,10 +182,20 @@
 
 <script>
 import { getUserInfo } from '@/api/user'
-import { getProjectsByStatus } from '@/api/applicant'
-import { getApplicants } from '@/api/repDept'
-import { getRepDepts } from '@/api/recDept'
-import { NOTPASS, SECONDREVIEW, THREEREVIEW, PASS, PASSRPD } from '@/variables'
+import { getProjects, getAppNames } from '@/api/applicant'
+import { getRpdNames } from '@/api/repDept'
+import { getRcdInfo } from '@/api/recDept'
+import {
+  NOTPASS,
+  SECONDREVIEW,
+  THREEREVIEW,
+  PASS,
+  PASSRPD,
+  RECDEPT,
+  DOWNLOADURL,
+  PROTYPES,
+  SUBJECTS
+} from '@/variables'
 export default {
   data() {
     const statusList = [NOTPASS, SECONDREVIEW, THREEREVIEW, PASS]
@@ -181,10 +215,17 @@ export default {
     return {
       statusList: statusList,
       statusFilter: statusFilter,
+      proTypeFilter: PROTYPES,
+      subjectFilter: SUBJECTS,
       appNameFilter: [],
       rpdNameFilter: [],
+      rcdNameFilter: [],
+      appNames: [],
+      rpdNames: [],
+      rcdNames: [],
+      selectDisabled1: false,
+      selectDisabled2: false,
       projectTable: [],
-      firstData: [],
       listLoading: true,
       dialogFormVisible: false,
       projectDetails: {
@@ -204,80 +245,71 @@ export default {
           }
         }
       },
-      pageSize: 5,
-      currentPage: 1,
-      pageSizes: [5, 10, 15, 20]
+      pageSizes: [5, 10, 15, 20],
+      total: 0,
+      query: {
+        userType: '',
+        userId: '',
+        statusStr: statusList.join(','),
+        pageSize: 5,
+        pageNum: 1,
+        proName: '',
+        proTypesStr: '',
+        subjectsStr: '',
+        appNamesStr: '',
+        rpdNamesStr: ''
+      }
     }
   },
   created() {
-    this.fetchData()
+    this.setQuery()
   },
   computed: {
     indexComputed() {
-      return (this.currentPage - 1) * this.pageSize + 1
+      return (this.query.pageNum - 1) * this.query.pageSize + 1
+    }
+  },
+  watch: {
+    query: {
+      deep: true,
+      handler: function(newVal, oldVal) {
+        this.fetchData()
+      }
     }
   },
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { userVo } = await getUserInfo()
-      let { projects } = await getProjectsByStatus(this.statusList)
-      projects = projects.filter(project => {
-        return project.applicant.repDept.recDept.id == userVo.id
-      })
-      this.firstData = this.projectTable = this.projectTable.concat(projects)
-      // const { repDepts } = await getRepDepts(userVo.id)
-      // for (const repDept of repDepts) {
-      //   if (repDept.rpdStatus == PASSRPD) {
-      //     const { applicants } = await getApplicants(repDept.id)
-      //     for (const applicant of applicants) {
-      //       const { projects } = await getProjectsByStatus({
-      //         applicant: applicant,
-      //         status: this.statusList
-      //       })
-      //       this.firstData = this.projectTable = this.projectTable.concat(
-      //         projects
-      //       )
-      //     }
-      //   }
-      // }
-      this.setFilter(this.firstData)
+      const { projects, total } = await getProjects(this.query)
+      this.projectTable = projects
+      this.total = total
       this.listLoading = false
     },
-    setFilter(projects) {
-      for (const project of projects) {
-        if (
-          this.appNameFilter &&
-          !this.appNameFilter.some(item => item.value == project.applicant.name)
-        ) {
-          this.appNameFilter.push({
-            text: project.applicant.name,
-            value: project.applicant.name
-          })
-        }
-        if (
-          this.rpdNameFilter &&
-          !this.rpdNameFilter.some(
-            item => item.value == project.applicant.repDept.deptName
-          )
-        ) {
-          this.rpdNameFilter.push({
-            text: project.applicant.repDept.deptName,
-            value: project.applicant.repDept.deptName
-          })
-        }
-        if (
-          this.rcdNameFilter &&
-          !this.rcdNameFilter.some(
-            item => item.value == project.applicant.repDept.recDept.deptName
-          )
-        ) {
-          this.rcdNameFilter.push({
-            text: project.applicant.repDept.recDept.deptName,
-            value: project.applicant.repDept.recDept.deptName
-          })
-        }
-      }
+    queryData() {
+      this.query.rcdNamesStr = this.rcdNames.join(',')
+      this.query.rpdNamesStr = this.rpdNames.join(',')
+      this.query.appNamesStr = this.appNames.join(',')
+      this.query.pageNum = 1
+    },
+    downloadFile(path) {
+      window.location.href = DOWNLOADURL + path
+    },
+    async getRpdNamesFilter() {
+      const { rpdNames } = await getRpdNames(this.rcdNames)
+      this.rpdNameFilter = rpdNames
+    },
+    async getAppNamesFilter() {
+      const { appNames } = await getAppNames(this.rpdNames)
+      this.appNameFilter = appNames
+    },
+    async setQuery() {
+      const { userVo } = await getUserInfo()
+      this.query.userType = RECDEPT
+      this.query.userId = userVo.id
+      const { userInfo } = await getRcdInfo(userVo.id)
+      this.rcdNameFilter = this.rcdNames = [userInfo.deptName]
+      this.selectDisabled1 = true
+      this.selectDisabled2 = false
     },
     formatStatus(row, column) {
       return this.statusFilter.filter(status => {
@@ -285,38 +317,44 @@ export default {
       })[0].text
     },
     handleSizeChange(val) {
-      this.pageSize = val
-      this.currentPage = 1
+      this.query.pageSize = val
+      this.query.pageNum = 1
     },
     handleCurrentChange(val) {
-      this.currentPage = val
+      this.query.pageNum = val
     },
     filterProjectTable(filters) {
-      this.projectTable = this.firstData
+      if (filters.proType) {
+        this.query.proTypesStr = filters.proType.join(',')
+      }
+      if (filters.subject) {
+        this.query.subjectsStr = filters.subject.join(',')
+      }
+      if (filters.proStatus) {
+        if (filters.proStatus.length != 0) {
+          this.query.statusStr = filters.proStatus.join(',')
+        } else {
+          this.query.statusStr = this.statusList.join(',')
+        }
+      }
 
-      if (filters.appName && filters.appName.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return filters.appName.indexOf(project.applicant.name) != -1
-        })
-      }
-      if (filters.proStatus && filters.proStatus.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return filters.proStatus.indexOf(project.proStatus) != -1
-        })
-      }
-      if (filters.rpdName && filters.rpdName.length != 0) {
-        this.projectTable = this.projectTable.filter(project => {
-          return (
-            filters.rpdName.indexOf(project.applicant.repDept.deptName) != -1
-          )
-        })
-      }
-      this.currentPage = 1
+      this.query.pageNum = 1
     }
   }
 }
 </script>
 <style lang='scss' scoped>
+.search {
+  margin-bottom: 5px;
+  .el-input {
+    width: 150px;
+    margin-right: 10px;
+  }
+  .el-select {
+    width: 180px;
+    margin-right: 6px;
+  }
+}
 .link {
   line-height: 25px;
 }

@@ -1,14 +1,61 @@
 <template>
   <div class="app-container">
-    <el-button
-      @click="multipleSelection.length==0?multipleSelectionTip():assignExpert(multipleSelection)"
-      icon="el-icon-check"
-      type="primary"
-      plain
-    >批量分配</el-button>
+    <div class="search">
+      <el-input v-model="query.proName" size="small" placeholder="请输入项目名称" />
+      <el-select
+        v-model="rcdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择推荐单位"
+        @visible-change="getRcdNamesFilter"
+      >
+        <el-option v-for="item in rcdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="rpdNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报单位"
+        @visible-change="getRpdNamesFilter"
+      >
+        <el-option v-for="item in rpdNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>-
+      <el-select
+        v-model="appNames"
+        size="small"
+        multiple
+        collapse-tags
+        placeholder="请选择申报人"
+        @visible-change="getAppNamesFilter"
+      >
+        <el-option v-for="item in appNameFilter" :key="item" :label="item" :value="item"></el-option>
+      </el-select>
+      <el-button @click="queryData()" icon="el-icon-search" type="primary" size="small" plain>查询</el-button>
+    </div>
+    <div class="header-toolbar">
+      <el-select
+        style="width:150px;margin-right:10px"
+        v-model="expertNum"
+        placeholder="请选择专家数量"
+        size="small"
+      >
+        <el-option label="专家数量：3" :value="3"></el-option>
+        <el-option label="专家数量：4" :value="4"></el-option>
+        <el-option label="专家数量：5" :value="5"></el-option>
+      </el-select>
+      <el-button
+        @click="multipleSelection.length==0?multipleSelectionTip():assignExpert(multipleSelection)"
+        icon="el-icon-check"
+        type="primary"
+        size="small"
+        plain
+      >批量分配</el-button>
+    </div>
     <el-table
       v-loading="listLoading"
-      :data="assignTable.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+      :data="assignTable"
       element-loading-text="Loading"
       border
       fit
@@ -19,27 +66,12 @@
       <el-table-column type="selection" width="55"></el-table-column>
       <el-table-column type="index" :index="indexComputed" label="序号" width="55px"></el-table-column>
       <el-table-column prop="id" label="项目编号" sortable></el-table-column>
-      <el-table-column prop="proType" label="项目类型"></el-table-column>
+      <el-table-column prop="proType" label="项目类型" :filters="proTypeFilter" :column-key="'proType'"></el-table-column>
       <el-table-column prop="proName" width="150px" label="项目名称"></el-table-column>
-      <el-table-column prop="subject" label="学科分类"></el-table-column>
-      <el-table-column
-        prop="applicant.name"
-        label="申报人"
-        :filters="appNameFilter"
-        :column-key="'appName'"
-      ></el-table-column>
-      <el-table-column
-        prop="applicant.repDept.deptName"
-        label="申报单位"
-        :filters="rpdNameFilter"
-        :column-key="'rpdName'"
-      ></el-table-column>
-      <el-table-column
-        prop="applicant.repDept.recDept.deptName"
-        label="推荐单位"
-        :filters="rcdNameFilter"
-        :column-key="'rcdName'"
-      ></el-table-column>
+      <el-table-column prop="subject" label="学科分类" :filters="subjectFilter" :column-key="'subject'"></el-table-column>
+      <el-table-column prop="applicant.name" label="申报人"></el-table-column>
+      <el-table-column prop="applicant.repDept.deptName" label="申报单位"></el-table-column>
+      <el-table-column prop="applicant.repDept.recDept.deptName" label="推荐单位"></el-table-column>
       <el-table-column fixed="right" label="操作" width="220px">
         <template slot-scope="scope">
           <el-button @click="assignExpert([scope.row])" type="text" size="small">分配</el-button>
@@ -50,51 +82,91 @@
       background
       @size-change="handleSizeChange"
       @current-change="handleCurrentChange"
-      :current-page="currentPage"
+      :current-page="query.pageNum"
       :page-sizes="pageSizes"
-      :page-size="pageSize"
+      :page-size="query.pageSize"
       layout="total, sizes, prev, pager, next, jumper"
-      :total="assignTable.length"
+      :total="total"
     ></el-pagination>
   </div>
 </template>
 
 <script>
-import { getProjectsByStatus, updateProjects } from '@/api/applicant'
+import { getProjects, updateProjects, getAppNames } from '@/api/applicant'
+import { getRecDepts } from '@/api/recDept'
+import { getRpdNames } from '@/api/repDept'
 import { getExperts, updateExperts } from '@/api/expert'
 import { addScore } from '@/api/score'
-import { PASSRPD, EXPERTASSIGN, EXPERTREVIEW } from '@/variables'
+import {
+  PASSRPD,
+  EXPERTASSIGN,
+  EXPERTREVIEW,
+  PROTYPES,
+  SUBJECTS
+} from '@/variables'
 import { shuffle } from '@/utils/random-data'
 export default {
   data() {
     return {
+      proTypeFilter: PROTYPES,
+      subjectFilter: SUBJECTS,
       appNameFilter: [],
       rpdNameFilter: [],
       rcdNameFilter: [],
+      rcdNames: [],
+      rpdNames: [],
+      appNames: [],
       assignTable: [],
-      firstData: [],
       listLoading: true,
       multipleSelection: [],
-      pageSize: 5,
-      currentPage: 1,
-      pageSizes: [5, 10, 15, 20]
+      pageSizes: [5, 10, 15, 20],
+      total: 0,
+      query: {
+        userType: '',
+        userId: '',
+        statusStr: '',
+        pageSize: 5,
+        pageNum: 1,
+        proName: '',
+        proTypesStr: '',
+        subjectsStr: '',
+        appNamesStr: '',
+        rpdNamesStr: '',
+        rcdNamesStr: ''
+      },
+      expertNum: 3
     }
   },
   created() {
-    this.fetchData()
+    this.query.statusStr = EXPERTASSIGN
   },
   computed: {
     indexComputed() {
-      return (this.currentPage - 1) * this.pageSize + 1
+      return (this.query.pageNum - 1) * this.query.pageSize + 1
+    }
+  },
+  watch: {
+    query: {
+      deep: true,
+      handler: function(newVal, oldVal) {
+        this.fetchData()
+      }
     }
   },
   methods: {
     async fetchData() {
       this.listLoading = true
-      const { projects } = await getProjectsByStatus([EXPERTASSIGN])
-      this.firstData = this.assignTable = projects
-      this.setFilter(this.firstData)
+      const { projects, total } = await getProjects(this.query)
+      this.assignTable = projects
+      this.total = total
+      this.setFilter(this.assignTable)
       this.listLoading = false
+    },
+    queryData() {
+      this.query.rcdNamesStr = this.rcdNames.join(',')
+      this.query.rpdNamesStr = this.rpdNames.join(',')
+      this.query.appNamesStr = this.appNames.join(',')
+      this.query.pageNum = 1
     },
     review(projects, msg, confirmMsg) {
       this.$confirm(msg, '提示', {
@@ -103,28 +175,30 @@ export default {
         type: 'warning'
       })
         .then(async () => {
-          for (const project of projects) {
-            let { experts } = await getExperts()
-            experts = shuffle(
-              experts.filter(expert => {
-                return expert.proNum < 5
-              })
-            ).slice(0, 3)
+          for (let project of projects) {
+            let { experts } = await getExperts(this.expertNum)
             project.proStatus = EXPERTREVIEW
-            for (const expert of experts) {
+            for (let expert of experts) {
               expert.proNum += 1
-              const { addResult } = await addScore(project, expert)
+              // expert.scores = expert.scores.concat([
+              //   {
+              //     project: project
+              //   }
+              // ])
+              project.scores = project.scores.concat([
+                {
+                  expert: expert
+                }
+              ])
             }
-            await updateExperts(experts)
+            // const { updateResult } = await updateExperts(experts)
           }
-          const { updatePros } = await updateProjects(projects)
-          if (updatePros.length != 0) {
-            this.$message({
-              message: confirmMsg,
-              type: 'success'
-            })
-            this.fetchData()
-          }
+          const { updateResult } = await updateProjects(projects)
+          this.$message({
+            message: confirmMsg,
+            type: 'success'
+          })
+          this.fetchData()
         })
         .catch(() => {
           this.$message({
@@ -145,11 +219,20 @@ export default {
         type: 'warning'
       })
     },
-    resetTableData() {
-      this.assignTable = []
-      this.appNameFilter = []
-      this.rpdNameFilter = []
+    async getRcdNamesFilter() {
       this.rcdNameFilter = []
+      const { recDepts } = await getRecDepts()
+      for (const recDept of recDepts) {
+        this.rcdNameFilter.push(recDept.deptName)
+      }
+    },
+    async getRpdNamesFilter() {
+      const { rpdNames } = await getRpdNames(this.rcdNames)
+      this.rpdNameFilter = rpdNames
+    },
+    async getAppNamesFilter() {
+      const { appNames } = await getAppNames(this.rpdNames)
+      this.appNameFilter = appNames
     },
     setFilter(projects) {
       for (const project of projects) {
@@ -184,38 +267,44 @@ export default {
       }
     },
     handleSizeChange(val) {
-      this.pageSize = val
-      this.currentPage = 1
+      this.query.pageSize = val
+      this.query.pageNum = 1
     },
     handleCurrentChange(val) {
-      this.currentPage = val
+      this.query.pageNum = val
     },
     filterProjectTable(filters) {
-      this.assignTable = this.firstData
-
-      if (filters.appName && filters.appName.length != 0) {
-        this.assignTable = this.assignTable.filter(project => {
-          return filters.appName.indexOf(project.applicant.name) != -1
-        })
+      if (filters.proType) {
+        this.query.proTypesStr = filters.proType.join(',')
       }
-      if (filters.rpdName && filters.rpdName.length != 0) {
-        this.assignTable = this.assignTable.filter(project => {
-          return (
-            filters.rpdName.indexOf(project.applicant.repDept.deptName) != -1
-          )
-        })
+      if (filters.subject) {
+        this.query.subjectsStr = filters.subject.join(',')
       }
-      if (filters.rcdName && filters.rcdName.length != 0) {
-        this.assignTable = this.assignTable.filter(project => {
-          return (
-            filters.rcdName.indexOf(
-              project.applicant.repDept.recDept.deptName
-            ) != -1
-          )
-        })
+      if (filters.proStatus) {
+        if (filters.proStatus.length != 0) {
+          this.query.statusStr = filters.proStatus.join(',')
+        } else {
+          this.query.statusStr = this.statusList.join(',')
+        }
       }
-      this.currentPage = 1
+      this.query.pageNum = 1
     }
   }
 }
 </script>
+<style lang='scss' scoped>
+span {
+  margin-right: 10px;
+}
+.search {
+  margin-bottom: 5px;
+  .el-input {
+    width: 150px;
+    margin-right: 10px;
+  }
+  .el-select {
+    width: 180px;
+    margin-right: 6px;
+  }
+}
+</style> 

@@ -79,13 +79,13 @@ export default {
   data() {
     return {
       loginForm: {
-        username: 'xiaobao520',
+        username: 'admin',
         password: '123456'
       },
       loginRules: {
         username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 15, message: '请输入正确的用户名', trigger: 'blur' }
+          { min: 3, max: 20, message: '请输入正确的用户名', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '请输入密码', trigger: 'blur' },

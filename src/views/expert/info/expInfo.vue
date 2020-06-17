@@ -30,8 +30,13 @@
 
       <el-row>
         <el-col :span="10">
-          <el-form-item label="出生日期：" prop="birthday">
-            <el-input v-model="expInfo.birthday" />
+          <el-form-item label="出生日期" prop="birthday">
+            <el-date-picker
+              v-model="expInfo.birthday"
+              type="date"
+              placeholder="Pick a date"
+              style="width: 100%;"
+            />
           </el-form-item>
         </el-col>
         <el-col :span="10" :offset="2">
@@ -42,8 +47,8 @@
       </el-row>
       <el-row>
         <el-col :span="10">
-          <el-form-item label="学历：" prop="edu">
-            <el-input v-model="expInfo.edu" />
+          <el-form-item label="学校：" prop="school">
+            <el-input v-model="expInfo.school" />
           </el-form-item>
         </el-col>
         <el-col :span="10" :offset="2">
@@ -119,6 +124,7 @@ export default {
         idCard: '',
         folk: '',
         birthday: '',
+        school: '',
         edu: '',
         profession: '',
         title: 0,
